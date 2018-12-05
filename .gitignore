@@ -102,3 +102,15 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#windows build
+*.exe
+*.dll
+
+#mac build
+*.app
+
+#game temp files
+*.bgeconf
+*.log
+*.blend1
