@@ -114,3 +114,5 @@ venv.bak/
 *.bgeconf
 *.log
 *.blend1
+.blend@
+/temp
