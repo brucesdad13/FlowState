@@ -1,0 +1,137 @@
+<gpx>
+   <wpt lon="-104.9709067" lat="39.654036">
+      <name>asset MGP gate large</name>
+      <extensions>
+         <compass>189.20916404040216</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9705079" lat="39.6540625">
+      <name>asset MGP gate large</name>
+      <extensions>
+         <compass>335.85827639387855</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9694132" lat="39.6551935">
+      <name>asset MGP gate large</name>
+      <extensions>
+         <compass>21.0446454346184</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9705088" lat="39.6548973">
+      <name>asset MGP gate large</name>
+      <extensions>
+         <compass>41.994254328482896</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9710233" lat="39.6549903">
+      <name>asset MGP gate</name>
+      <extensions>
+         <compass>32.37420108581651</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9721818" lat="39.6549483">
+      <name>asset MGP gate</name>
+      <extensions>
+         <compass>35.81576903557</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9734021" lat="39.6547939">
+      <name>asset MGP gate</name>
+      <extensions>
+         <compass>50.571668605326515</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9734042" lat="39.6555932">
+      <name>asset MGP gate</name>
+      <extensions>
+         <compass>8.921678623616792</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9732945" lat="39.6568269">
+      <name>asset MGP gate</name>
+      <extensions>
+         <compass>6.871922133296099</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9736828" lat="39.6586618">
+      <name>asset MGP gate</name>
+      <extensions>
+         <compass>5.157320520167077</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9735683" lat="39.6595313">
+      <name>asset MGP gate</name>
+      <extensions>
+         <compass>6.451155166353128</compass>
+      </extensions>
+   </wpt>
+
+
+
+   <wpt lon="-104.9709067" lat="39.654036">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>189.20916404040216</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9705079" lat="39.6540625">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>335.85827639387855</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9694132" lat="39.6551935">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>21.0446454346184</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9705088" lat="39.6548973">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>41.994254328482896</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9710233" lat="39.6549903">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>32.37420108581651</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9721818" lat="39.6549483">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>35.81576903557</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9734021" lat="39.6547939">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>50.571668605326515</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9734042" lat="39.6555932">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>8.921678623616792</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9732945" lat="39.6568269">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>6.871922133296099</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9736828" lat="39.6586618">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>5.157320520167077</compass>
+      </extensions>
+   </wpt>
+   <wpt lon="-104.9735683" lat="39.6595313">
+      <name>asset MGP flag</name>
+      <extensions>
+         <compass>6.451155166353128</compass>
+      </extensions>
+   </wpt>
+</gpx>
