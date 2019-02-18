@@ -3,6 +3,8 @@ import socket
 import select
 import sys
 from _thread import *
+import pickle
+import ast
 
 """The first argument AF_INET is the address domain of the
 socket. This is used when we have an Internet Domain with
@@ -11,12 +13,12 @@ SOCK_STREAM means that data or characters are read in
 a continuous flow."""
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+delim = b'\x1E'
 # takes the first argument from command prompt as IP address
 IP_address = socket.gethostname()
 
 # takes second argument from command prompt as port number
-Port = 5068
+Port = 5069
 
 """
 binds the server to an entered IP address and at the
@@ -24,6 +26,7 @@ specified port number.
 The client must be aware of these parameters
 """
 server.bind((IP_address, Port))
+server.settimeout(10)
 
 """
 listens for 100 active connections. This number can be
@@ -34,50 +37,56 @@ server.listen(100)
 list_of_clients = []
 
 def clientthread(conn, addr):
-
+    print("client thread started")
+    connectionOpen = True
     # sends a message to the client whose user object is conn
-    conn.send("Welcome to this chatroom!")
-
+    #conn.send("Welcome to this chatroom!")
+    buffer = b''
     while True:
+        while True:
             try:
-                message = conn.recv(2048)
-                if message:
+                buffer += conn.recv(1024)
+                if delim in buffer:
+                    delimIndex = buffer.find(delim)
+                    frame = buffer[:delimIndex]
+                    frame = ast.literal_eval(frame.decode("utf-8"))
+                    print(frame)
+                    print("FOUND THE END OF THE MESSAGE!!!!")
+                    print("frame: "+str(frame))
+                    broadcast(frame, conn)
+                    buffer = buffer[delimIndex+1:-1]
+                    print("remaining buffer = "+str(buffer))
 
-                    """prints the message and address of the
-                    user who just sent the message on the server
-                    terminal"""
-                    print("<" + str(addr[0]) + "> " + str(message))
-
-                    # Calls broadcast function to send message to all
-                    message_to_send = "<" + addr[0] + "> " + message
-                    broadcast(message_to_send, conn)
-
-                else:
-                    """message may have no content if the connection
-                    is broken, in this case we remove the connection"""
-                    remove(conn)
-
-            except:
-                continue
+            except Exception as e:
+                print(e)
+                connectionOpen = False
+                break
+        if(not connectionOpen):
+            print("client unresponsive")
+            remove(conn)
+            break
 
 """Using the below function, we broadcast the message to all
 clients who's object is not the same as the one sending
 the message """
 def broadcast(message, connection):
-    for clients in list_of_clients:
-        if clients!=connection:
-            try:
-                clients.send(message)
-            except:
-                clients.close()
+    print("broadcast()")
+    print(str(len(list_of_clients))+" clients connected")
+    for client in list_of_clients:
+        #if client!=connection:
+        try:
+            dataOut = str(message).encode("utf-8")+delim
+            print("sending message to client: "+str(client.getpeername()[0])+": "+str(dataOut))
+            client.send(dataOut)
+        except Exception as e:
+            print(e)
+            client.close()
+            # if the link is broken, we remove the client
+            remove(client)
 
-                # if the link is broken, we remove the client
-                remove(clients)
-
-"""The following function simply removes the object
-from the list that was created at the beginning of
-the program"""
 def remove(connection):
+    print("remove()")
+    print("disconnecting client: "+str(connection.getpeername()[0]))
     if connection in list_of_clients:
         list_of_clients.remove(connection)
 
@@ -87,18 +96,22 @@ while True:
     conn which is a socket object for that user, and addr
     which contains the IP address of the client that just
     connected"""
-    conn, addr = server.accept()
+    try:
+        print("waiting for new clients...")
+        conn, addr = server.accept()
 
-    """Maintains a list of clients for ease of broadcasting
-    a message to all available people in the chatroom"""
-    list_of_clients.append(conn)
+        """Maintains a list of clients for ease of broadcasting
+        a message to all available people in the chatroom"""
+        list_of_clients.append(conn)
 
-    # prints the address of the user that just connected
-    print(str(addr[0]) + " connected")
+        # prints the address of the user that just connected
+        print(str(addr) + " connected")
 
-    # creates and individual thread for every user
-    # that connects
-    start_new_thread(clientthread,(conn,addr))
+        # creates and individual thread for every user
+        # that connects
+        start_new_thread(clientthread,(conn,addr))
+    except:
+        pass
 
 conn.close()
 server.close()
