@@ -5,6 +5,8 @@ import sys
 from _thread import *
 import pickle
 import ast
+import FSNObjects
+import traceback
 
 """The first argument AF_INET is the address domain of the
 socket. This is used when we have an Internet Domain with
@@ -18,15 +20,17 @@ delim = b'\x1E'
 IP_address = socket.gethostname()
 
 # takes second argument from command prompt as port number
-Port = 5069
+port = 5069
+
+serverName = "noobs only"
 
 """
 binds the server to an entered IP address and at the
 specified port number.
 The client must be aware of these parameters
 """
-server.bind((IP_address, Port))
-server.settimeout(10)
+server.bind((IP_address, port))
+server.settimeout(60)
 
 """
 listens for 100 active connections. This number can be
@@ -45,20 +49,30 @@ def clientthread(conn, addr):
     while True:
         while True:
             try:
-                buffer += conn.recv(1024)
+                buffer += conn.recv(1)
                 if delim in buffer:
                     delimIndex = buffer.find(delim)
                     frame = buffer[:delimIndex]
                     frame = ast.literal_eval(frame.decode("utf-8"))
-                    print(frame)
                     print("FOUND THE END OF THE MESSAGE!!!!")
                     print("frame: "+str(frame))
-                    broadcast(frame, conn)
+                    messageType = frame[FSNObjects.MESSAGE_TYPE_KEY]
                     buffer = buffer[delimIndex+1:-1]
                     print("remaining buffer = "+str(buffer))
 
+                    #see if there's anything we need to do
+                    print("got message of type "+str(messageType))
+                    if messageType == FSNObjects.PLAYER_EVENT_TYPE_KEY:
+                        message = FSNObjects.PlayerEvent.getMessage(frame)
+                        event = FSNObjects.ServerEvent(FSNObjects.ServerEvent.PLAYER_JOINED,str(message.extra))
+                        broadcast(event,conn)
+                        frame = None
+
+                    if(frame!=None):
+                        broadcast(frame, conn)
+
             except Exception as e:
-                print(e)
+                print(traceback.format_exc())
                 connectionOpen = False
                 break
         if(not connectionOpen):
@@ -73,16 +87,16 @@ def broadcast(message, connection):
     print("broadcast()")
     print(str(len(list_of_clients))+" clients connected")
     for client in list_of_clients:
-        #if client!=connection:
-        try:
-            dataOut = str(message).encode("utf-8")+delim
-            print("sending message to client: "+str(client.getpeername()[0])+": "+str(dataOut))
-            client.send(dataOut)
-        except Exception as e:
-            print(e)
-            client.close()
-            # if the link is broken, we remove the client
-            remove(client)
+        if client!=connection:
+            try:
+                dataOut = str(message).encode("utf-8")+delim
+                print("sending message to client: "+str(client.getpeername()[0])+": "+str(dataOut))
+                client.send(dataOut)
+            except Exception as e:
+                print(e)
+                client.close()
+                # if the link is broken, we remove the client
+                remove(client)
 
 def remove(connection):
     print("remove()")
