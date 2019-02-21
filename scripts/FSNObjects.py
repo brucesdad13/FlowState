@@ -48,6 +48,7 @@ class ServerEvent:
     PLAYER_JOINED = 0
     PLAYER_LEFT = 1
     SERVER_QUIT = 2
+    ACK = 3
     
     def __init__(self, eventType, extra=None):
         self.messageType = SERVER_EVENT_TYPE_KEY

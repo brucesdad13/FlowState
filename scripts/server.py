@@ -7,6 +7,7 @@ import pickle
 import ast
 import FSNObjects
 import traceback
+import time
 
 """The first argument AF_INET is the address domain of the
 socket. This is used when we have an Internet Domain with
@@ -113,6 +114,13 @@ def clientThread(conn, addr):
                         newClientState = frame
                         clientStates[senderID] = newClientState
                         #print(clientStates)
+                        #let the client know they can send more data
+                        ack = FSNObjects.ServerEvent(FSNObjects.ServerEvent.ACK)
+                        print("sleep")
+                        time.sleep(3)
+                        print("done")
+                        
+                        send(serverState,conn)
 
                     if(frame!=None):
                         broadcast(frame, conn)

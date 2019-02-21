@@ -19,6 +19,7 @@ class FSNClient:
         self.buffer = b''
         self.state = FSNObjects.PlayerState(None, None, None, None, None)
         self.messageHandler = None
+        self.serverReady = True
         
     def connect(self):
         self.server.connect((self.serverIP, self.serverPort))
@@ -28,7 +29,7 @@ class FSNClient:
         read_sockets,write_socket, error_socket = select.select([self.server],[],[],0.0)
         for socks in read_sockets:
             while True:
-                newData = socks.recv(1024)
+                newData = socks.recv(1)
                 self.buffer+=newData
                 if self.delim in self.buffer:
                     delimIndex = self.buffer.find(self.delim)
@@ -70,16 +71,16 @@ class FSNClient:
         
     def quit(self,senderID):
         quitEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_QUIT,senderID)
-        sendEvent(quitEvent)
+        self.sendEvent(quitEvent)
         self.server.close()
 
     def run(self):
-        #t = time.time()    
-        #out = {"subject":"positionUpdate","time":t}
-        messageOut = str(self.state).encode("utf-8")
-        self.sendFrame(messageOut)
+        print(self.serverReady)
+        if(self.serverReady):
+            messageOut = str(self.state).encode("utf-8")
+            self.sendFrame(messageOut)
+            self.serverReady = False
         frame = self.recvFrame()
-        #peerTime = frame['time']
 
     
     
