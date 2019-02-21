@@ -67,6 +67,11 @@ class FSNClient:
 
     def setMessageHandler(self,method):
         self.messageHandler = method
+        
+    def quit(self,senderID):
+        quitEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_QUIT,senderID)
+        sendEvent(quitEvent)
+        self.server.close()
 
     def run(self):
         #t = time.time()    

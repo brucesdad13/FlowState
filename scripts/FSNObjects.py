@@ -65,6 +65,25 @@ class ServerEvent:
         message[MESSAGE_EXTRA_KEY] = self.extra
         return str(message)
 
+class ServerState(Message):
+    #player state keys
+    PLAYER_STATES_KEY = "PS"
+    def __init__(self, playerStates, extra=None):
+        self.messageType = SERVER_STATE
+        self.playerStates = playerStates
+        self.extra = extra
+
+    def getMessage(message):
+        obj = ServerState(message[ServerState.PLAYER_STATES_KEY],message[MESSAGE_EXTRA_KEY])
+        return obj
+
+    def __str__(self):
+        message = {}
+        message[MESSAGE_TYPE_KEY] = self.messageType
+        message[ServerState.PLAYER_STATES_KEY] = self.playerStates
+        message[MESSAGE_EXTRA_KEY] = self.extra
+        return str(message)
+
 class PlayerState(Message):
     #player state keys
     PLAYER_POSITION_KEY = "PP"
@@ -95,19 +114,22 @@ class PlayerState(Message):
 class PlayerEvent:
     #player event types
     PLAYER_JOINED = 0
+    PLAYER_QUIT = 1
     
-    def __init__(self, eventType, extra=None):
-        self.messageType = PLAYER_EVENT_TYPE_KEY
+    def __init__(self, eventType, senderID, extra=None):
+        self.messageType = PLAYER_EVENT
         self.eventType = eventType
+        self.senderID = senderID
         self.extra = extra
 
     def getMessage(message):
-        obj = PlayerEvent(message[PLAYER_EVENT_TYPE_KEY], message[MESSAGE_EXTRA_KEY])
+        obj = PlayerEvent(message[PLAYER_EVENT_TYPE_KEY], message[SENDER_ID_KEY], message[MESSAGE_EXTRA_KEY])
         return obj
 
     def __str__(self):
         message = {}
         message[MESSAGE_TYPE_KEY] = self.messageType
+        message[SENDER_ID_KEY] = self.senderID
         message[PLAYER_EVENT_TYPE_KEY] = self.eventType
         message[MESSAGE_EXTRA_KEY] = self.extra
         return str(message)    

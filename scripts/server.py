@@ -30,7 +30,7 @@ specified port number.
 The client must be aware of these parameters
 """
 server.bind((IP_address, port))
-server.settimeout(60)
+server.settimeout(30)
 
 """
 listens for 100 active connections. This number can be
@@ -38,9 +38,36 @@ increased as per convenience.
 """
 server.listen(100)
 
-list_of_clients = []
+connectionList = []
+clientStates = {}
+outboundMessages = []
 
-def clientthread(conn, addr):
+def outboundMessageThread():
+    global outboundMessages
+    while True:
+        socketsToDisconnect = []
+        if(len(outboundMessages)>0):
+            #print("we've got something to send")
+            message = outboundMessages.pop(0)
+            socket = message['socket']
+            data = message['data']
+            try:
+                dataOut = str(data).encode("utf-8")+delim
+                #print("sending message to client: "+str(socket.getpeername()[0])+": "+str(dataOut))
+                socket.send(dataOut)
+            except Exception as e:
+                print(traceback.format_exc())
+                socketsToDisconnect.append(socket)
+    
+        for socket in socketsToDisconnect:
+            try:
+                socket.close()
+                # if the link is broken, we remove the client
+                connectionList.remove(socket)
+            except:
+                pass
+        
+def clientThread(conn, addr):
     print("client thread started")
     connectionOpen = True
     # sends a message to the client whose user object is conn
@@ -54,19 +81,38 @@ def clientthread(conn, addr):
                     delimIndex = buffer.find(delim)
                     frame = buffer[:delimIndex]
                     frame = ast.literal_eval(frame.decode("utf-8"))
-                    print("FOUND THE END OF THE MESSAGE!!!!")
-                    print("frame: "+str(frame))
+                    #print("FOUND THE END OF THE MESSAGE!!!!")
+                    #print("frame: "+str(frame))
                     messageType = frame[FSNObjects.MESSAGE_TYPE_KEY]
                     buffer = buffer[delimIndex+1:-1]
-                    print("remaining buffer = "+str(buffer))
+                    #print("remaining buffer = "+str(buffer))
 
-                    #see if there's anything we need to do
-                    print("got message of type "+str(messageType))
-                    if messageType == FSNObjects.PLAYER_EVENT_TYPE_KEY:
+                    #a player is sending an event
+                    if messageType == FSNObjects.PLAYER_EVENT:
                         message = FSNObjects.PlayerEvent.getMessage(frame)
-                        event = FSNObjects.ServerEvent(FSNObjects.ServerEvent.PLAYER_JOINED,str(message.extra))
+                        event = FSNObjects.ServerState(clientStates)
                         broadcast(event,conn)
-                        frame = None
+                        #a new player is joining the game
+                        if(message.eventType==FSNObjects.PlayerEvent.PLAYER_JOINED):
+                            #let's let him know the state of the game
+                            serverState = FSNObjects.ServerState(clientStates)
+                            send(serverState,conn)
+                            #let's associate the player state with this socket
+                            for clientConnection in connectionList:
+                                if(clientConnection['socket'] == conn):
+                                    clientConnection['senderID'] = message.senderID
+                        if(message.eventType==FSNObjects.PlayerEvent.PLAYER_QUIT):
+                            removeByID(senderID)
+                            
+
+                    #a player is sending an update about their current state
+                    if messageType == FSNObjects.PLAYER_STATE:
+                        #print("Got a player state. Updating client states")
+                        message = FSNObjects.PlayerState.getMessage(frame)
+                        senderID = message.senderID
+                        newClientState = frame
+                        clientStates[senderID] = newClientState
+                        #print(clientStates)
 
                     if(frame!=None):
                         broadcast(frame, conn)
@@ -83,26 +129,51 @@ def clientthread(conn, addr):
 """Using the below function, we broadcast the message to all
 clients who's object is not the same as the one sending
 the message """
-def broadcast(message, connection):
-    print("broadcast()")
-    print(str(len(list_of_clients))+" clients connected")
-    for client in list_of_clients:
-        if client!=connection:
-            try:
-                dataOut = str(message).encode("utf-8")+delim
-                print("sending message to client: "+str(client.getpeername()[0])+": "+str(dataOut))
-                client.send(dataOut)
-            except Exception as e:
-                print(e)
-                client.close()
-                # if the link is broken, we remove the client
-                remove(client)
+def broadcast(message, socket):
+    #print("broadcast()")
+    for clientConnection in connectionList:
+        clientSocket = clientConnection['socket']
+        if clientSocket!=socket:
+            send(message,clientSocket)
+
+def send(message, socket):
+    #print("send()")
+    #global outboundMessages
+    
+    #outboundMessages.append({"data":message,"socket":socket})
+    try:
+        dataOut = str(message).encode("utf-8")+delim
+        #print("sending message to client: "+str(socket.getpeername()[0])+": "+str(dataOut))
+        socket.send(dataOut)
+    except Exception as e:
+        print(traceback.format_exc())
+        #socketsToDisconnect.append(socket)
+        socket.close()
+        # if the link is broken, we remove the client
+        connectionList.remove(socket)
 
 def remove(connection):
     print("remove()")
     print("disconnecting client: "+str(connection.getpeername()[0]))
-    if connection in list_of_clients:
-        list_of_clients.remove(connection)
+    for clientConnection in connectionList:
+        if connection == clientConnection['socket']:
+            if(clientConnection['senderID']!=None):
+                clientState = clientStates[clientConnection['senderID']]
+                del clientState
+            del clientConnection
+
+def removeByID(senderID):
+    print("removeByID()")
+    connectionToDelete = None
+    stateToDelete = None
+    for clientConnection in connectionList:
+        if senderID == clientConnection['senderID']:
+            print("disconnecting client: "+str(senderID))
+            connectionToDelete = clientConnection
+            break
+    
+    connectionList.remove(connectionToDelete)
+    del clientStates[senderID]
 
 while True:
 
@@ -111,19 +182,21 @@ while True:
     which contains the IP address of the client that just
     connected"""
     try:
-        print("waiting for new clients...")
+        #print(str(len(connectionList))+" clients connected")
+        #print("waiting for new clients...")
         conn, addr = server.accept()
 
         """Maintains a list of clients for ease of broadcasting
         a message to all available people in the chatroom"""
-        list_of_clients.append(conn)
+        connectionList.append({"socket":conn,"senderID":None})
 
         # prints the address of the user that just connected
         print(str(addr) + " connected")
 
         # creates and individual thread for every user
         # that connects
-        start_new_thread(clientthread,(conn,addr))
+        start_new_thread(clientThread,(conn,addr))
+        #start_new_thread(outboundMessageThread,())
     except:
         pass
 
