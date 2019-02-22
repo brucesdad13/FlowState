@@ -83,6 +83,13 @@ class utils:
     def getMode(self):
         return logic.gameState['mode']
 
+    def getNetworkClient(self):
+        print("getting network client "+str(logic.gameState['networkClient']))
+        return logic.gameState['networkClient']
+
+    def setNetworkClient(self,client):
+        logic.gameState['networkClient'] = client
+
     def forceDefaults(self,defaultData):
         self.log("Profile versions do not match! You will need to reconfigure your settings ("+logic.globalDict['version']+": "+defaultData['version']+")")
         logic.globalDict = defaultData
@@ -110,7 +117,7 @@ class utils:
         defaultData['profiles'].append(defaultProfile)
 
         #logic.maps = {"
-        logic.defaultGameState = {"selectedMap":"2018 Regional Final.fmp", "notification":{"Text":""}, "mode":self.MODE_MENU, "track":{"countdownTime":5,"checkpoints":[],"nextCheckpoint":1,"lastCheckpoint":1}, "playerData":{"lap":0,"checkpoint":0},"mapEditor":None}
+        logic.defaultGameState = {"selectedMap":"2018 Regional Final.fmp", "notification":{"Text":""}, "mode":self.MODE_MENU, "track":{"countdownTime":5,"checkpoints":[],"nextCheckpoint":1,"lastCheckpoint":1}, "playerData":{"lap":0,"checkpoint":0},"mapEditor":None,"networkClient":None}
         logic.loadGlobalDict()
         self.log(logic.globalDict)
         if('version' in logic.globalDict):

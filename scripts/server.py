@@ -116,10 +116,12 @@ def clientThread(conn, addr):
                         clientStates[senderID] = newClientState
                         #print(clientStates)
                         #let the client know they can send more data
-                        sendAck(conn)
+                    
 
                     if(frame!=None):
+                        sendAck(conn)
                         broadcast(frame, conn)
+                        time.sleep(0.05)
 
             except Exception as e:
                 print(traceback.format_exc())
@@ -134,6 +136,7 @@ def clientThread(conn, addr):
 clients who's object is not the same as the one sending
 the message """
 def sendAck(socket):
+    print("sending ack to "+str(socket.getpeername()[0]))
     ack = FSNObjects.ServerEvent(FSNObjects.ServerEvent.ACK)
     send(ack,socket)
 
