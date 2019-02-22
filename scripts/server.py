@@ -82,6 +82,7 @@ def clientThread(conn, addr):
                     delimIndex = buffer.find(delim)
                     frame = buffer[:delimIndex]
                     frame = ast.literal_eval(frame.decode("utf-8"))
+                    
                     #print("FOUND THE END OF THE MESSAGE!!!!")
                     #print("frame: "+str(frame))
                     messageType = frame[FSNObjects.MESSAGE_TYPE_KEY]
@@ -115,12 +116,7 @@ def clientThread(conn, addr):
                         clientStates[senderID] = newClientState
                         #print(clientStates)
                         #let the client know they can send more data
-                        ack = FSNObjects.ServerEvent(FSNObjects.ServerEvent.ACK)
-                        print("sleep")
-                        time.sleep(3)
-                        print("done")
-                        
-                        send(serverState,conn)
+                        sendAck(conn)
 
                     if(frame!=None):
                         broadcast(frame, conn)
@@ -137,6 +133,10 @@ def clientThread(conn, addr):
 """Using the below function, we broadcast the message to all
 clients who's object is not the same as the one sending
 the message """
+def sendAck(socket):
+    ack = FSNObjects.ServerEvent(FSNObjects.ServerEvent.ACK)
+    send(ack,socket)
+
 def broadcast(message, socket):
     #print("broadcast()")
     for clientConnection in connectionList:
