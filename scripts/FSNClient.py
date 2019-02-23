@@ -97,12 +97,10 @@ class FSNClient:
         return self.serverConnected
 
     def run(self):
-        print(self.serverReady)
         if(self.serverReady):
             messageOut = str(self.state).encode("utf-8")
             self.sendFrame(messageOut)
             self.serverReady = False
-            print("sending state")
         frame = self.recvFrame()
 
     
