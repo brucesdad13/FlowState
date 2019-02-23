@@ -73,6 +73,7 @@ def clientThread(conn, addr):
     connectionOpen = True
     # sends a message to the client whose user object is conn
     #conn.send("Welcome to this chatroom!")
+    lastRecv = time.time()
     buffer = b''
     while True:
         while True:
@@ -82,7 +83,7 @@ def clientThread(conn, addr):
                     delimIndex = buffer.find(delim)
                     frame = buffer[:delimIndex]
                     frame = ast.literal_eval(frame.decode("utf-8"))
-                    
+                    lastRecv = time.time()
                     #print("FOUND THE END OF THE MESSAGE!!!!")
                     #print("frame: "+str(frame))
                     messageType = frame[FSNObjects.MESSAGE_TYPE_KEY]
@@ -104,7 +105,9 @@ def clientThread(conn, addr):
                                 if(clientConnection['socket'] == conn):
                                     clientConnection['senderID'] = message.senderID
                         if(message.eventType==FSNObjects.PlayerEvent.PLAYER_QUIT):
-                            removeByID(senderID)
+                            #removeByID(senderID)
+                            remove(conn)
+                            connectionOpen = False
                             
 
                     #a player is sending an update about their current state
@@ -125,11 +128,11 @@ def clientThread(conn, addr):
 
             except Exception as e:
                 print(traceback.format_exc())
+                remove(conn)
                 connectionOpen = False
                 break
         if(not connectionOpen):
-            print("client unresponsive")
-            remove(conn)
+            print("client thread ending")
             break
 
 """Using the below function, we broadcast the message to all
@@ -164,14 +167,28 @@ def send(message, socket):
         connectionList.remove(socket)
 
 def remove(connection):
+    global connectionList
+    global clientStates
     print("remove()")
-    print("disconnecting client: "+str(connection.getpeername()[0]))
-    for clientConnection in connectionList:
+    connectionToDelete = None
+    stateToDelete = None
+    for i in range(0,len(connectionList)):
+        clientConnection = connectionList[i]
         if connection == clientConnection['socket']:
             if(clientConnection['senderID']!=None):
                 clientState = clientStates[clientConnection['senderID']]
-                del clientState
-            del clientConnection
+                print("removing client state: "+str(clientState))
+                stateToDelete = clientConnection['senderID']
+                #del clientState
+            print("disconnecting socket: "+str(clientConnection))
+            connectionToDelete = i
+            #del clientConnection
+    if connectionToDelete!=None:
+        del connectionList[connectionToDelete]
+    if stateToDelete!=None:
+        del clientStates[stateToDelete]
+    print("remaning connectionList: "+str(connectionList))
+    print("remaning clientStates: "+str(clientStates))
 
 def removeByID(senderID):
     print("removeByID()")
@@ -185,6 +202,8 @@ def removeByID(senderID):
     
     connectionList.remove(connectionToDelete)
     del clientStates[senderID]
+    print(clientConnections)
+    print(connectionList)
 
 while True:
 
@@ -196,7 +215,7 @@ while True:
         #print(str(len(connectionList))+" clients connected")
         #print("waiting for new clients...")
         conn, addr = server.accept()
-
+        conn.settimeout(15)
         """Maintains a list of clients for ease of broadcasting
         a message to all available people in the chatroom"""
         connectionList.append({"socket":conn,"senderID":None})
