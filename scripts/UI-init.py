@@ -6,7 +6,7 @@ render.showMouse(1)
 scene = logic.getCurrentScene()
 cont = logic.getCurrentController()
 owner = cont.owner
-utils = logic.utils
+#utils = logic.utils
 UI = bge.UI
 render.setFullScreen(True)
 
@@ -20,16 +20,16 @@ def soloGameAction():
         if(scene!=currentScene):
             scene.end()
     currentScene.replace("main regional finals")
- 
+
 def multiplayerAction():
     pass
-    
+
 def settingsAction():
     currentScene = logic.getCurrentScene()
     currentScene.replace("UI-settings")
-    
-    
-    
+
+
+
 def quitGameAction():
     logic.endGame()
 
@@ -47,5 +47,5 @@ else:
     try:
         UI.run(cont)
     except Exception as e:
-        utils.log(traceback.format_exc())
+        logic.utils.log(traceback.format_exc())
         owner['init'] = -1

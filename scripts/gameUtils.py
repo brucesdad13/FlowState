@@ -37,6 +37,8 @@ class utils:
     def __init__(self):
         self.setDefaults()
         self.log("INIT!")
+        self.setDefaults()
+        self.gameState = self.getDefaultGameState()
         self.id = 0
 
     def log(self,error):
@@ -65,23 +67,35 @@ class utils:
 
     def setDefaultState(self):
         self.log("setting default game state")
-        logic.gameState = copy.deepcopy(logic.defaultGameState)
+        self.gameState = copy.deepcopy(logic.defaultGameState)
+
+    def getDefaultGameState(self):
+        return copy.deepcopy(logic.defaultGameState)
+
+    def getGameState(self):
+        return self.gameState
 
     def resetGameState(self):
         self.log("resetting game state!!!")
-        logic.gameState = copy.deepcopy(logic.defaultGameState)
+        self.gameState = copy.deepcopy(logic.defaultGameState)
 
     def selectMap(self,selectedMap):
-        logic.gameState["selectedMap"] = selectedMap
+        self.gameState["selectedMap"] = selectedMap
 
     def getSelectedMap(self):
-        return logic.gameState["selectedMap"]
+        return self.gameState["selectedMap"]
 
     def setMode(self,newMode):
-        logic.gameState['mode'] = newMode
+        self.gameState['mode'] = newMode
 
     def getMode(self):
-        return logic.gameState['mode']
+        return self.gameState['mode']
+
+    def getNetworkClient(self):
+        return self.gameState['networkClient']
+
+    def setNetworkClient(self,client):
+        self.gameState['networkClient'] = client
 
     def forceDefaults(self,defaultData):
         self.log("Profile versions do not match! You will need to reconfigure your settings ("+logic.globalDict['version']+": "+defaultData['version']+")")
@@ -110,9 +124,9 @@ class utils:
         defaultData['profiles'].append(defaultProfile)
 
         #logic.maps = {"
-        logic.defaultGameState = {"selectedMap":"2018 Regional Final.fmp", "notification":{"Text":""}, "mode":self.MODE_MENU, "track":{"countdownTime":5,"checkpoints":[],"nextCheckpoint":1,"lastCheckpoint":1}, "playerData":{"lap":0,"checkpoint":0},"mapEditor":None}
+        logic.defaultGameState = {"selectedMap":"2018 Regional Final.fmp", "notification":{"Text":""}, "mode":self.MODE_MENU, "track":{"countdownTime":5,"checkpoints":[],"nextCheckpoint":1,"lastCheckpoint":1}, "playerData":{"lap":0,"checkpoint":0},"mapEditor":None,"networkClient":None}
         logic.loadGlobalDict()
-        self.log(logic.globalDict)
+        #self.log(logic.globalDict)
         if('version' in logic.globalDict):
             if(logic.globalDict['version']!=defaultData['version']):
                 self.forceDefaults(defaultData)

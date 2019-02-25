@@ -7,5 +7,5 @@ if own['lap'] >= 0:
             logic.lapTimes.append(str(format(own['current_lap'], '.2f')))
             if(logic.lapTimer['race time'] > 120):
                 logic.finishedLastLap = True
-                logic.gameState['notification']['Text'] = "race complete"
+                logic.utils.gameState['notification']['Text'] = "race complete"
                 print("race is complete")

@@ -18,21 +18,21 @@ def readFile(fileName):
     return ast.literal_eval(saveDataString)
 
 def main():
-    selectedMap = logic.gameState['selectedMap']
+    selectedMap = logic.utils.gameState['selectedMap']
     mapData = readFile(selectedMap)
-    
+
     scene = logic.getCurrentScene()
     utils.log("getting assets...")
     utils.log(len(mapData['assets']))
-    
+
     #clear any dead checkpoints
-    logic.gameState['track']['checkpoints'] = []
-    
+    logic.utils.gameState['track']['checkpoints'] = []
+
     for asset in mapData['assets']:
         spawn = object
         owner.position = asset['p']
         #owner.orientation = asset['o']
-        
+
         if('s' in asset):
             s = asset['s']
             owner.localScale = s
@@ -45,7 +45,7 @@ def main():
             if 'spawn' in child: #we don't want spawners adding junk when we edit them
                 child.endObject()
         if('m' in asset):
-            
+
             m = asset['m']
             newObj['metadata'] = m
         if('m' not in  asset):
@@ -57,22 +57,22 @@ def main():
             utils.addMetadata(newObj)
         print("loading metadata: "+str(newObj['metadata']))
         if(asset['n'] == utils.ASSET_START_FINISH):
-            logic.gameState['startFinishPlane'] = newObj
+            logic.utils.gameState['startFinishPlane'] = newObj
             utils.log("added start finish gate")
         if('checkpoint order' in newObj['metadata']):
             #if utils.getMode()!=utils.MODE_EDITOR:
-                
-                
-            logic.gameState['track']['checkpoints'].append(newObj)
-            if newObj['metadata']['checkpoint order'] > logic.gameState['track']['lastCheckpoint']:
-                logic.gameState['track']['lastCheckpoint'] = newObj['metadata']['checkpoint order']
-            
+
+
+            logic.utils.gameState['track']['checkpoints'].append(newObj)
+            if newObj['metadata']['checkpoint order'] > logic.utils.gameState['track']['lastCheckpoint']:
+                logic.utils.gameState['track']['lastCheckpoint'] = newObj['metadata']['checkpoint order']
+
         if(asset['n'] == "asset launch pad"):
             newSpawnPoint = newObj
-            if "spawnPoints" in logic.gameState:
-                logic.gameState['launchPads'].append(newSpawnPoint)
+            if "spawnPoints" in logic.utils.gameState:
+                logic.utils.gameState['launchPads'].append(newSpawnPoint)
             else:
-                logic.gameState['launchPads'] = [newSpawnPoint]
-            #utils.log("setting spawn point "+str(logic.gameState))
-    
+                logic.utils.gameState['launchPads'] = [newSpawnPoint]
+            #utils.log("setting spawn point "+str(logic.utils.gameState))
+
 main()

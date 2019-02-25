@@ -25,26 +25,26 @@ def applySettings():
     for scene in scenes:
         if(scene!=currentScene):
             if(scene.name == "Main Game"):
-                currentMap = logic.gameState["selectedMap"]
+                currentMap = logic.utils.gameState["selectedMap"]
                 logic.utils.resetGameState()
-                logic.gameState["selectedMap"] = currentMap
+                logic.utils.gameState["selectedMap"] = currentMap
                 scene.restart()
-    
+
     logic.saveGlobalDict()
-    
+
 def spawnBoolRow(label,height,key,action):
 
     rowBox = UI.BoxElement(window,[50,height],11,0.5, blockColor, 5)
     titleText = UI.TextElement(window,[rowBox.position[0]-30,rowBox.position[1]], textColor, 4, label)
-    
+
     box = UI.BoxElement(window,[80,height],1,0.5, blockColor, 1)
     text = UI.TextElement(window,[box.position[0],box.position[1]], textColor, 0, "INVERTED")
     button = UI.UIButton(text,box,settingsAction)
-    
+
     #indicatorText = UI.TextElement(window,[50,height], textColor, 0, "0")
     invertedBooleanButton = UI.UIBooleanInput(button,text,key,graphicsSettings[key])
     return invertedBooleanButton
-    
+
 def backAction():
     bge.logic.sendMessage("cam1")
     currentScene = logic.getCurrentScene()
@@ -55,7 +55,7 @@ def backAction():
     removedScene = sceneHistory.pop(-1)
     print("removing scene "+str(removedScene))
     currentScene.replace(backScene)
-    
+
 if(owner['init']!=True):
     render.showMouse(1)
     logic.globalDict['sceneHistory'].append(logic.getCurrentScene().name)
@@ -63,21 +63,21 @@ if(owner['init']!=True):
     window = UI.Window()
 
     inset = 0.2
-    
+
     mainMenuBlock = UI.BoxElement(window,[50,95],11,1, blockColor, 1)
     mainMenuText = UI.TextElement(window,mainMenuBlock.position, textColor, 0, "GRAPHIC")
 
     shaders = spawnBoolRow("Shaders",50,"shaders",settingsAction)
-    
+
     #back button
     backBlockElement = UI.BoxElement(window,[10,10],1,.5, blockColor, 1)
     backText = UI.TextElement(window,backBlockElement.position, textColor, 0, "BACK")
     backButton = UI.UIButton(backText,backBlockElement,backAction)
-    
+
     backBlockElement = UI.BoxElement(window,[10,10],1,.5, blockColor, 1)
     backText = UI.TextElement(window,backBlockElement.position, textColor, 0, "BACK")
     backButton = UI.UIButton(backText,backBlockElement,backAction)
-    
+
     #apply button
     applyBox = UI.BoxElement(window,[90,10],1,.5, blockColor, 1)
     applyText = UI.TextElement(window,applyBox.position, textColor, 0, "APPLY")

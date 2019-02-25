@@ -1,7 +1,7 @@
 import bge
 from inspect import signature
 logic = bge.logic
-utils = logic.utils
+#utils = logic.utils
 render = bge.render
 scene = logic.getCurrentScene()
 cont = logic.getCurrentController()
@@ -18,7 +18,7 @@ class UI:
         self.cont = controller
         self.owner = controller.owner
         self.owner['lastHitObject'] = None
-        
+
     def runWindow(window, cont):
         owner = cont.owner
         mouseSensor = cont.sensors['Mouse']
@@ -26,7 +26,7 @@ class UI:
         wheelUp = cont.sensors['MouseWheelUp']
         wheelDown = cont.sensors['MouseWheelDown']
         hitObject = mouseSensor.hitObject
-        
+
         inputs = logic.mouse.activeInputs
 
         for key in window.elements:
@@ -43,11 +43,11 @@ class UI:
                                     if(input.type == bge.events.LEFTMOUSE):
                                         #element.owner['action']()
                                         element.performAction()
-                        
+
                 else:
                     if(element.type == BUTTON):
                         element.deHighlight()
-                
+
                 if(element.type == LIST):
                     if(wheelDown.positive):
                         element.scrollUp()
@@ -55,12 +55,12 @@ class UI:
                     if(wheelUp.positive):
                         element.scrollDown()
                         print("scroll down")
-        
+
     def run(cont): #PLEASE DEPRECATE ME BY ADDING PAGE ELEMENTS TO SCREEN ELEMENTS
         owner = cont.owner
         mouseSensor = cont.sensors['Mouse']
         hitObject = mouseSensor.hitObject
-        
+
         if("lastHitObject" in owner):
             pass
         else:
@@ -70,21 +70,21 @@ class UI:
             if(owner['lastHitObject']!=hitObject):
                 if hitObject!=None:
                     if("button" in hitObject.getPropertyNames()):
-                        
+
                         hitObject['button'].highlight()
                         owner['lastHitObject'] = hitObject
-                    
-            
+
+
         if(hitObject == None)or(owner['lastHitObject']!=hitObject):
             if owner['lastHitObject']!=None:
                 if("button" in owner['lastHitObject'].getPropertyNames()):
                     owner['lastHitObject']['button'].deHighlight()
                     owner['lastHitObject'] = None
-                    
+
         inputs = logic.mouse.activeInputs
         for inputKey in inputs:
             input = inputs[inputKey]
-            
+
             if(input.type == bge.events.LEFTMOUSE):
                 if(input.released):
                     if(hitObject != None):
@@ -92,8 +92,8 @@ class UI:
                         if("button" in hitObject.getPropertyNames()):
                             element = element.button
                             if 'value' in hitObject and hitObject['value']!=None:
-                                utils.log(hitObject['value'])
-                                
+                                logic.utils.log(hitObject['value'])
+
                                 element.performAction()
                             else:
                                 element.performAction()
@@ -103,11 +103,11 @@ class UI:
             self.width = 800#render.getWindowWidth()
             self.ratio = self.width/self.height
             self.elements = {}
-            utils.log(str(self.height/self.height)+":"+str(self.width/self.height))
-        
+            logic.utils.log(str(self.height/self.height)+":"+str(self.width/self.height))
+
         def add(self,id,element):
             self.elements[id] = element
-        
+
         #def get(self,id):
         #    element = self.elements[id]
         #    print(element)
@@ -128,7 +128,7 @@ class UI:
             self.children = children
             self.disabled = False
             self.spawnElement()
-            
+
         def setColor(self,newColor):
             self.owner.color = newColor
             for mesh in self.owner.meshes:
@@ -137,35 +137,35 @@ class UI:
                     for v in range(0,vertArray):
                         vert = mesh.getVertex(mat,v)
                         vert.color = newColor
-            
+
         def spawnElement(self):
             self.owner = scene.addObject(self.type)
             self.updateElementPosition()
             self.setScale()
             self.setColor(self.color)
             self.owner['UIElement'] = self
-            
+
         def disable(self):
             self.owner.visible = True
             self.disabled = True
-            
+
         def enable(self):
             self.owner.visible = False
             self.disabled = False
-            
+
         def updateElementPosition(self):
-                
+
             self.owner.position = self.getRealTranslatedPosition()
-            
+
         def getRealTranslatedPosition(self):
             if(self.window.ratio > 1):
                 #width is larger than height
-                
+
                 offsetX = 5
                 offsetY = ((5/self.window.ratio))
                 xScale = 0.1
                 yScale = 0.1/self.window.ratio
-                
+
             else:
                 offsetX = ((5/self.window.ratio))
                 offsetY = 5
@@ -174,7 +174,7 @@ class UI:
             return [(self.position[0]*xScale)-(offsetX),(self.position[1]*yScale)-(offsetY),-self.depth]
         def setScale(self):
             self.owner.localScale = [self.width,self.height,1]
-            
+
     class TextElement(UIElement):
         primative = True
         def __init__(self,window,position,color=[255,255,255],depth=0,text="",scale=1,parent=[],children=[]):
@@ -194,30 +194,30 @@ class UI:
             self.text = text
             self.disabled = False
             self.spawnElement()
-            
-        def getCenteredTextOffset(self,text):   
-            return len(text)*0.55*self.scale 
-        
+
+        def getCenteredTextOffset(self,text):
+            return len(text)*0.55*self.scale
+
         def getCenteredTextPosition(self,position):
             return [position[0]-self.centerOffset,position[1]+self.textHang]
-        
+
         def enable(self):
             super(UI.TextElement, self).enable()
-            
+
         def disable(self):
             super(UI.TextElement, self).disable()
-            
+
         def setText(self,newText):
             self.text = newText
             self.owner.text = self.text
             self.getCenteredTextOffset(self.text)
             self.getCenteredTextPosition(self.position)
-            
+
         def spawnElement(self):
             super(UI.TextElement, self).spawnElement()
             self.owner.text = self.text
             self.owner.localScale = [self.scale*0.2,self.scale*0.2,self.scale*0.2]
-            
+
     class TextInputElement(UIElement):
         primative = True
         def __init__(self,window,position,color=[255,255,255],depth=0,text="",scale=1,parent=[],children=[]):
@@ -237,35 +237,35 @@ class UI:
             self.text = text
             self.disabled = False
             self.spawnElement()
-            
-        def getCenteredTextOffset(self,text):   
-            return len(text)*0.55*self.scale 
-        
+
+        def getCenteredTextOffset(self,text):
+            return len(text)*0.55*self.scale
+
         def getCenteredTextPosition(self,position):
             return [position[0]-self.centerOffset,position[1]+self.textHang]
-        
+
         def enable(self):
             super(UI.TextElement, self).enable()
-            
+
         def disable(self):
             super(UI.TextElement, self).disable()
-            
+
         def setText(self,newText):
             self.text = newText
             #self.owner.text = self.text
             self.getCenteredTextOffset(self.text)
             self.getCenteredTextPosition(self.position)
-            
+
         def spawnElement(self):
             self.owner = scene.addObject("UIInput")
             self.updateElementPosition()
             self.setScale()
             self.setColor(self.color)
             self.owner['UIElement'] = self
-            
+
             self.owner.text = self.text
             self.owner.localScale = [self.scale*0.2,self.scale*0.2,self.scale*0.2]
-            
+
     class BoxElement(UIElement):
         primative = True
         def __init__(self,window,position,width,height,color=[1,1,1,1],depth=0,parent=[],children=[]):
@@ -284,7 +284,7 @@ class UI:
             self.spawnElement()
         def enable(self):
             super(UI.TextElement, self).enable()
-            
+
         def disable(self):
             super(UI.TextElement, self).disable()
     class UIStickDisplay:
@@ -298,10 +298,10 @@ class UI:
             self.box.owner['button'] = False
             self.box.owner['action'] = action
             self.disabled = False
-            
+
         def performAction(self):
             self.box.owner['action']()
-            
+
     class UIButton:
         primative = False
         def __init__(self,textElement,boxElement,action,key=None,value=None):
@@ -317,18 +317,18 @@ class UI:
             self.value = value
             self.disabled = False
             self.subscriptions = []
-            
+
         def subscribe(self,method):
             self.subscriptions.append(method)
-            
+
         def highlight(self):
             s = 1.1
             scale = [self.box.width,self.box.height,1]
             self.box.owner.localScale = [scale[0]*s,scale[1]*s,1]
-            
+
         def deHighlight(self):
             self.box.owner.localScale = [self.box.width,self.box.height,1]
-            
+
         def performAction(self):
             sig = signature(self.action)
             params = sig.parameters
@@ -339,11 +339,11 @@ class UI:
             else:
                 for subscriber in self.subscriptions:
                     subscriber(self.key,self.value)
-                self.action(self.key,self.value) 
-                    
+                self.action(self.key,self.value)
+
         def getAction(self):
             return self.action
-        
+
     class UIList:
         primative = False
         def __init__(self,boxElement,items,spacing):
@@ -358,34 +358,34 @@ class UI:
             self.maxScrollPosition = 10
             self.minScrollPosition = 0
             self.owner = None
-        
+
         def scrollUp(self):
             if(self.scrollPosition<self.maxScrollPosition):
                 self.scrollPosition += 1
                 for element in self.items:
                     self.moveElements(element,1)
                 print(self.scrollPosition)
-        
+
         def scrollDown(self):
             if(self.scrollPosition>self.minScrollPosition):
                 self.scrollPosition -= 1
                 for element in self.items:
                     self.moveElements(element,-self.spacing)
                 print(self.scrollPosition)
-                
+
         def moveElements(self,element,distance):
             if element.type == BUTTON:
                 textStartPos = element.text.position
                 element.text.position = [textStartPos[0],textStartPos[1]+(distance*10)]
                 element.text.updateElementPosition()
-                
+
                 boxStartPos = element.box.position
                 element.box.position = [boxStartPos[0],boxStartPos[1]+(distance*10)]
                 element.box.updateElementPosition()
                 print("moving")
-        
-        
-            
+
+
+
     class UINumberInput:
         primative = False
         def __init__(self,increaseButton,decreaseButton,indicatorText,value=0,min=None,max=None,increments=1):
@@ -405,7 +405,7 @@ class UI:
             self.decreaseButton.subscribe(self.decreaseAction)
             self.disabled = False
             self.refreshValue()
-            
+
         def increaseAction(self,key,value):
             if((self.value + self.increments)<=self.max):
                 self.value += self.increments
@@ -415,7 +415,7 @@ class UI:
             self.increaseButton.value = self.value
             #self.increaseButton.performAction()
             #self.secondaryIncreaseAction(self.increaseButton.key,self.increaseButton.value)
-            
+
         def decreaseAction(self,key,value):
             if((self.value - self.increments)>=self.min):
                 self.value -= self.increments
@@ -424,10 +424,10 @@ class UI:
             self.refreshValue()
             self.decreaseButton.value = self.value
             #self.decreaseButton.performAction()
-            
+
         def refreshValue(self):
             self.text.owner['Text'] = self.value
-            
+
     class UIBooleanInput:
         primative = False
         def __init__(self,button,indicatorText,key,value=False):
@@ -441,7 +441,7 @@ class UI:
             self.button.subscribe(self.action)
             self.disabled = False
             self.refreshValue()
-            
+
         def action(self,key,value):
             if(self.value):
                 self.value = False
@@ -451,7 +451,7 @@ class UI:
             self.button.value = self.value
             self.button.key = self.key
             #self.secondaryAction(self.dictKey,self.value)
-            
+
         def refreshValue(self):
             self.text.owner['Text'] = str(self.value)
 

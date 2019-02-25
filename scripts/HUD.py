@@ -11,7 +11,7 @@ bestLap = logic.getCurrentScene().objects['HUDBestLap']
 times = logic.getCurrentScene().objects['HUDLapTimes']
 holeshot = logic.getCurrentScene().objects['HUDHoleshot']
 countdown = logic.getCurrentScene().objects['HUDCountdown']
-logic.gameState['notification'] = logic.getCurrentScene().objects['HUDNotification']
+logic.utils.gameState['notification'] = logic.getCurrentScene().objects['HUDNotification']
 laps['Text'] = "LAPS: "+logic.currentLap
 lastLap['Text'] = "LAST LAP: "+logic.lastLapTime
 bestLap['Text'] = "BEST LAP: "+logic.bestLapTime
@@ -22,10 +22,10 @@ laps['Text'] = "LAPS: "+logic.currentLap
 lastLap['Text'] = "LAST LAP: "+logic.lastLapTime
 bestLap['Text'] = "BEST LAP: "+logic.bestLapTime
 errorLog['Text'] = "Error: "+logic.errorLog
-countdownTime = logic.gameState['track']['countdownTime']
+countdownTime = logic.utils.gameState['track']['countdownTime']
 try:
     if logic.countingDown:
-        
+
         if logic.countdown < 0:
             own['countdown'] = 0
             logic.countdown = 0
@@ -33,14 +33,16 @@ try:
             logic.countdown = own['countdown']
             countdown['Text'] = int((countdownTime+1)-own['countdown'])
             if(own['countdown'] > countdownTime):
+                logic.countingDown = False
                 countdown['Text'] = "GO"
-            else:
+            if(own['countdown'] < countdownTime):
                 logic.lapTimer['race time'] = 0.0
                 logic.raceTimer = 0
-            if(own['countdown'] > (countdownTime+0.5)):
+            if(own['countdown'] > (countdownTime)):
                 logic.countingDown = False
     else:
-        countdown['Text'] = ""
+        if(own['countdown'] > countdownTime+0.5):
+            countdown['Text'] = ""
 except:
     logic.countingDown = False
 
@@ -48,5 +50,5 @@ timesText = "TIME: "+str(logic.raceTimer)
 for i in range(0,len(logic.lapTimes)):
     timesText+='\n'
     timesText+="LAP "+str(i)+": "+str(logic.lapTimes[i])
-    
+
 times['Text'] = timesText

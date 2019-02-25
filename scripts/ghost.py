@@ -2,10 +2,10 @@ import bge.logic as logic
 owner = logic.getCurrentController().owner
 #logic.globalDict['playerQuad'] = owner
 def main():
-    if('startFinishPlane' in logic.gameState):
-        startFinishPlane = logic.gameState['startFinishPlane']
+    if('startFinishPlane' in logic.utils.gameState):
+        startFinishPlane = logic.utils.gameState['startFinishPlane']
         lap = startFinishPlane['lap']
-        
+
         if lap < 0:
             logic.ghosts = []
         else:
@@ -17,18 +17,18 @@ def main():
             currentGhost = logic.ghosts[len(logic.ghosts)-1]
             if(lap<6):
                 recordGhostData(owner,currentGhost)
-            if len(logic.ghosts)>1:   
+            if len(logic.ghosts)>1:
                 for i in range(0,len(logic.ghosts)-1):
                     lastGhost = logic.ghosts[i]
-                
+
                     setGhostData(lastGhost)
-            
+
 def createGhostData(obj,ghostObject):
     return {"obj":ghostObject,"currentFrame":0,"frames":[{"pos":list(obj.position),"ori":[list(obj.orientation[0]),list(obj.orientation[1]),list(obj.orientation[2])]}]}
 
 def recordGhostData(obj, currentGhost):
     currentGhost['frames'].append({"pos":list(obj.position),"ori":[list(obj.orientation[0]),list(obj.orientation[1]),list(obj.orientation[2])]})
-    
+
 def setGhostData(ghost):
     frame = ghost["currentFrame"]
     ghost["currentFrame"] += 1

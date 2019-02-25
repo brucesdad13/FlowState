@@ -18,11 +18,11 @@ def restartAction():
     for scene in scenes:
         if(scene!=currentScene):
             scene.end()
-    currentMap = logic.gameState["selectedMap"]
+    currentMap = logic.utils.gameState["selectedMap"]
     logic.utils.resetGameState()
-    logic.gameState["selectedMap"] = currentMap
+    logic.utils.gameState["selectedMap"] = currentMap
     currentScene.replace("Main Game")
-    
+
 def mainMenuAction():
     scenes = logic.getSceneList()
     currentScene = logic.getCurrentScene()
@@ -32,11 +32,11 @@ def mainMenuAction():
     logic.utils.resetGameState()
     logic.utils.setMode(logic.utils.MODE_MENU)
     currentScene.replace("Menu Background")
-    
+
 def settingsAction():
     currentScene = logic.getCurrentScene()
     currentScene.replace("UI-settings")
-    
+
 def quitGameAction():
     logic.endGame()
 
@@ -55,27 +55,27 @@ if(owner['init']!=True):
 
     mainMenuBlock = UI.BoxElement(window,[50,95],11,1, blockColor, 1)
     mainMenuText = UI.TextElement(window,mainMenuBlock.position, textColor, 0, "PAUSE MENU")
-    
+
     mainMenuBlock = UI.BoxElement(window,[10,50],2,1, blockColor, 1)
     mainMenuText = UI.TextElement(window,mainMenuBlock.position, textColor, 0, "MAIN MENU")
     mainMenuButton = UI.UIButton(mainMenuText,mainMenuBlock,mainMenuAction)
-    
+
     restartBlock = UI.BoxElement(window,[50,50],2,1, blockColor, 1)
     restartText = UI.TextElement(window,restartBlock.position, textColor, 0, "RESTART")
     restartButton = UI.UIButton(restartText,restartBlock,restartAction)
-    
+
     settingsBlockElement = UI.BoxElement(window,[90,50],2,1, blockColor, 1)
     settingsText = UI.TextElement(window,settingsBlockElement.position, textColor, 0, "SETTINGS")
     settingsButton = UI.UIButton(settingsText,settingsBlockElement,settingsAction)
-    
+
     quitBlockElement = UI.BoxElement(window,[90,10],1,.5, blockColor, 1)
     quitText = UI.TextElement(window,quitBlockElement.position, textColor, 0, "QUIT")
     quitButton = UI.UIButton(quitText,quitBlockElement,quitGameAction)
-    
+
     resumeElement = UI.BoxElement(window,[10,10],1,.5, blockColor, 1)
     resumeText = UI.TextElement(window,resumeElement.position, textColor, 0, "RESUME")
     resumeButton = UI.UIButton(resumeText,resumeElement,resumeAction)
-    
+
 
 else:
     try:

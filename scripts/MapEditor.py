@@ -20,7 +20,7 @@ class MapEditor:
     def __init__(self):
         self.cont = logic.getCurrentController()
         self.owner = self.cont.owner
-        
+
         self.cursor = self.findChildWithProperty("mapEditorCursor")
         self.camera = self.findChildWithProperty("mapEditorCamera")
         self.cursorOffsetPosition = [0,50,0]
@@ -43,10 +43,10 @@ class MapEditor:
         self.altMode = False
         self.moveSpeed = self.mediumSpeed
         self.editing = False
-        
+
         self.snapOrientation = True
         self.snapPosition = True
-        
+
         self.cursor.removeParent()
         self.leftClick = self.cont.sensors['MouseLeftButton']
         self.rightClick = self.cont.sensors['MouseRightButton']
@@ -54,19 +54,19 @@ class MapEditor:
         self.middleClick = self.cont.sensors['MouseMiddle']
         self.scrollDown = self.cont.sensors['MouseWheelDown']
         self.mouseMovement = self.cont.sensors['MouseMovement']
-        
+
         self.keyboard = self.cont.sensors['Keyboard']
-        
+
         self.cameraRay = self.cont.sensors['CameraRay']
-        
+
         self.assetIndex = 0
         self.availableAssets = utils.ASSETS#["asset MGP gate","asset MGP gate large","asset MGP gate hanging large","asset MGP gate high large","asset MGP gate double large","asset MGP ladder large","asset MGP gate angled dive large","asset MGP gate dive large","asset MGP hurdle","asset MGP hurdle large","asset MGP flag","asset pole","asset lumenier gate large","asset table","asset launch pad","asset cone","asset checkpoint square","asset start finish"]
         self.nextAsset = self.availableAssets[self.assetIndex]
         self.selectedAsset = None
         self.addNextAsset()#logic.getCurrentScene().addObject(self.nextAsset,self.cursor,0)
         self.selectedAsset.setParent(self.cursor)
-        
-        
+
+
         self.currentMode = self.MODE_3D
         render.showMouse(0)
         print("HIDE MOUSE")
@@ -81,7 +81,7 @@ class MapEditor:
         if foundObject == False:
             child = None
         return child
-    
+
     def updateCursor(self):
         height = 0
         if(self.selectedAsset != None):
@@ -91,7 +91,7 @@ class MapEditor:
         self.cursor.applyRotation([-math.pi/2,0,0],True) #camera has weird axis
         self.cursor.position = self.camera.position
         self.cursor.applyMovement(self.cursorOffsetPosition,True)
-        
+
         if(self.snapPosition):
             cPos = self.cursor.position
             self.cursor.position = [roundTo(cPos[0],self.posSnap),roundTo(cPos[1],self.posSnap),roundTo(cPos[2],self.posSnap)]
@@ -102,22 +102,22 @@ class MapEditor:
             self.cursor.applyRotation([math.radians(roundTo(cOri[0],self.snapOri)),math.radians(roundTo(cOri[1],self.snapOri)),math.radians(roundTo(cOri[2],self.snapOri))],True)
         else:
             self.cursor.applyRotation(self.cursorOffsetOrientation,True)
-        
+
         if(self.snapPosition):
             scale = self.cursorOffsetScale
             self.cursor.localScale = [roundTo(scale[0],self.snapScale),roundTo(scale[1],self.snapScale),roundTo(scale[2],self.snapScale)]
         else:
             self.cursor.localScale = self.cursorOffsetScale
-        
-        
+
+
     def placeCurrentAsset(self):
         print("placeCurrentAsset")
         print(self.editing)
-        
+
         for child in self.selectedAsset.childrenRecursive:
             if("asset" in self.selectedAsset):
                 child['spawn'] = True
-                
+
         self.selectedAsset.removeParent()
         self.makeSolid(self.selectedAsset)
         print("made "+str(self.selectedAsset.name)+" solid")
@@ -126,14 +126,14 @@ class MapEditor:
             self.addNextAsset()
         else:
             self.selectedAsset = None
-        
+
     def replaceCurrentAsset(self):
         print("replaceCurrentAsset")
         print(self.editing)
         self.selectedAsset.endObject()
         self.nextAsset = self.availableAssets[self.assetIndex]
         self.addNextAsset()
-        
+
     def addNextAsset(self):
         print("addNextAsset")
         print(self.editing)
@@ -145,13 +145,13 @@ class MapEditor:
             if 'spawn' in child:
                 child['spawn'] = True
         self.makeGhost(self.selectedAsset)
-        
-        
+
+
     def deleteCurrentAsset(self):
         if self.selectedAsset != None:
             self.selectedAsset.endObject()
             self.selectedAsset = None
-            
+
     def deleteAsset(self):
         ray = self.getCameraRay()
         obj = ray[0]
@@ -159,7 +159,7 @@ class MapEditor:
             if("asset" in obj and "solid" in obj):
                 obj.endObject()
         #return rayHit
-        
+
     def setMode(self,mode):
         self.currentMode = mode
         if mode == self.MODE_MENU:
@@ -169,18 +169,18 @@ class MapEditor:
             self.centerMouse()
             render.showMouse(0)
             self.removeMenuScene()
-            
+
     def addMenuScene(self):
         menuScene = "UI-editor-menu"
         logic.addScene(menuScene)
-    
+
     def removeMenuScene(self):
         menuScene = "UI-editor-menu"
         scenes = logic.getSceneList()
         for scene in scenes:
             if(str(scene)==menuScene):
                 scene.end()
-    
+
     def pushCursor(self):
         ray = self.getCameraRay()
         rayPos = ray[1]
@@ -188,7 +188,7 @@ class MapEditor:
         if(rayPos!=None):
             distance = self.camera.getDistanceTo(rayPos)
             self.cursorOffsetPosition = [0,distance,0]
-            
+
     def getKeyStates(self,keyboard):
         pressedKeys = []
         activeKeys = []
@@ -204,21 +204,21 @@ class MapEditor:
             if(event[1] == bge.logic.KX_SENSOR_JUST_DEACTIVATED ):
                 releasedKeys.append(event[0])
         return (pressedKeys,activeKeys,inactiveKeys,releasedKeys)
-    
+
     def handleNewEditState(self):
         if(self.editing):
             self.deleteCurrentAsset()
         else:
             if(self.selectedAsset==None):
                 self.addNextAsset()
-            
+
     def applyMetadata(self,key,value):
         print("applying metadata "+str(key)+": "+str(value)+" to "+str(self.selectedAsset))
         ray = self.getCameraRay()
         if(ray[0]!=None):
             ray[0]['metadata'][key] = copy.deepcopy(value)
             print(self.selectedAsset['metadata'])
-            
+
     def makeGhost(self, asset):
         try:
             del asset['solid']
@@ -226,12 +226,12 @@ class MapEditor:
             pass
         for child in asset.childrenRecursive:
             try:
-                child.collisionGroup = 2   
+                child.collisionGroup = 2
                 del child['solid']
             except:
                 pass
-        asset.collisionGroup = 2   
-        
+        asset.collisionGroup = 2
+
     def makeSolid(self, asset):
         try:
             asset['solid'] = True
@@ -239,12 +239,12 @@ class MapEditor:
             pass
         for child in asset.childrenRecursive:
             try:
-                child.collisionGroup = 1  
+                child.collisionGroup = 1
                 child['solid'] = True
             except:
                 pass
-        asset.collisionGroup = 1  
-        
+        asset.collisionGroup = 1
+
     def selectAsset(self):
         print("selectAsset")
         print(self.editing)
@@ -254,7 +254,7 @@ class MapEditor:
             if ray[0] != None:
                 asset = ray[0]
                 if 'asset' in asset:
-                    
+
                     if(asset.parent != None):
                         asset.removeParent()
                     self.makeGhost(asset)
@@ -278,8 +278,8 @@ class MapEditor:
                     asset.position = self.cursor.position
                     self.selectedAsset = asset
                     asset.setParent(self.cursor)
-            
-                
+
+
     def editAsset(self):
         print("selectAsset")
         print(self.editing)
@@ -290,27 +290,27 @@ class MapEditor:
                 if asset.name in utils.ASSETS:
                     self.selectedAsset = asset
                     self.enterMenuMode()
-                
+
     def enter3DMode(self):
         self.centerMouse()
         self.currentSensitivity = 0
         self.setMode(self.MODE_3D)
         if self.editing:
             self.selectedAsset = None
-        
+
     def enterMenuMode(self):
         self.setMode(self.MODE_MENU)
-    
+
     def handleInputs(self):
         (pressedKeys,activeKeys,inactiveKeys,releasedKeys) = self.getKeyStates(self.keyboard)
-        
+
         #mouse controls
         leftClick = self.leftClick.triggered and self.leftClick.positive
         rightClick = self.rightClick.triggered and self.rightClick.positive
         scrollUp = self.scrollUp.triggered and self.scrollUp.positive
         middleClick = self.middleClick.triggered and self.middleClick.positive
         scrollDown = self.scrollDown.triggered and self.scrollDown.positive
-        
+
         editAddToggle = bge.events.SPACEKEY in pressedKeys
         delete = bge.events.DELKEY in pressedKeys
         backspace = bge.events.BACKSPACEKEY in pressedKeys
@@ -320,17 +320,17 @@ class MapEditor:
         backward = bge.events.SKEY in activeKeys
         right = bge.events.DKEY in activeKeys
         left = bge.events.AKEY in activeKeys
-        
+
         snapToggle = bge.events.GKEY in pressedKeys
         toggleScale = bge.events.TKEY in pressedKeys
         resetScaleRot = bge.events.RKEY in pressedKeys
-        
+
         itemUp = bge.events.UPARROWKEY in pressedKeys
         itemDown = bge.events.DOWNARROWKEY in pressedKeys
-        
+
         speedUp = bge.events.LEFTSHIFTKEY in activeKeys
         escapeToggle = bge.events.ESCKEY in pressedKeys
-        
+
         altMode = bge.events.LEFTCTRLKEY in activeKeys
         if self.currentMode == self.MODE_3D:
             if leftClick:
@@ -338,11 +338,11 @@ class MapEditor:
                     self.editAsset()
                 else:
                     self.placeCurrentAsset()
-                    
+
             if editAddToggle:
                 self.editing = not self.editing
                 self.handleNewEditState()
-                
+
             if scrollUp:
                 if(self.snapToGround):
                     self.snapToGround = False
@@ -350,7 +350,7 @@ class MapEditor:
                     self.cursorOffsetPosition[1]+=5
                 else:
                     self.cursorOffsetPosition[1]+=2.5
-                
+
             if scrollDown:
                 if(self.snapToGround):
                     self.snapToGround = False
@@ -358,87 +358,87 @@ class MapEditor:
                     self.cursorOffsetPosition[1]-=5
                 else:
                     self.cursorOffsetPosition[1]-=2
-                
+
             if middleClick:
                 self.snapToGround = not self.snapToGround
-                
+
             self.altMode = altMode
-                    
+
             if(self.snapToGround):
                 self.pushCursor()
-                
+
             if(delete) or (backspace):
                 self.deleteAsset()
-            
+
             if snapToggle:
                 self.snapPosition = not self.snapPosition
-            
+
             if toggleScale:
                 self.scaleMode = not self.scaleMode
                 if(self.scaleMode):
                     self.cursor.replaceMesh("Cursor Scale", 1, 0)
                 else:
                     self.cursor.replaceMesh("Cursor Rotate", 1, 0)
-                
+
             if resetScaleRot:
                 if self.scaleMode:
                     self.cursorOffsetScale = [1,1,1]
                     #self.cursor.localScale = [1,1,1]
                 else:
                     self.cursorOffsetOrientation = [0,0,0]
-            
+
             f = [0,0]
             if forward:
                 f[1] += self.moveSpeed*frameTime
-                
+
             if backward:
                 f[1] -= self.moveSpeed*frameTime
-                
+
             if right:
                 f[0] += self.moveSpeed*frameTime
-                
+
             if left:
                 f[0] -= self.moveSpeed*frameTime
-                
+
             d = self.movementDamp*frameTime
             v = self.linearVelocity
             self.linearVelocity = [(v[0]*(1-d))+(f[0]*d),(v[1]*(1-d))+(f[1]*d)]
-            self.owner.applyMovement([v[0],v[1],0],True)  
-                
-                
-            if itemUp: 
+            self.owner.applyMovement([v[0],v[1],0],True)
+
+
+            if itemUp:
                 if(self.assetIndex<len(self.availableAssets)-1):
                     print(self.assetIndex)
                     self.assetIndex+=1
                     self.replaceCurrentAsset()
-                    
-            if itemDown: 
+
+            if itemDown:
                 if(self.assetIndex>0):
                     self.assetIndex-=1
                     self.replaceCurrentAsset()
-                
+
             if speedUp:
                 self.moveSpeed = self.fastSpeed
             else:
                 self.moveSpeed = self.mediumSpeed
-                
+
             self.handleMouseLook()
-                
+
         if escapeToggle:
             if(self.currentMode == self.MODE_MENU):
                 self.enter3DMode()
             else:
                 self.enterMenuMode()
-        
+
     def centerMouse(self):
         windowSize = [render.getWindowWidth(),render.getWindowHeight()]
         center = [int(windowSize[0]/2),int(windowSize[1]/2)]
         render.setMousePosition(center[0],center[1])
         self.mousePosition = center
-    
+
     def updateMousePosition(self):
         self.mousePosition = self.mouseMovement.position
-        
+
     def handleMouseLook(self):
         mousePos = self.mousePosition
         rightClick = self.rightClick.positive
@@ -473,7 +473,7 @@ class MapEditor:
                         newScale[2] = minScale
                     self.cursorOffsetScale = newScale
             else:
-                
+
                 if(self.rightClick.triggered):
                     self.selectAsset()
         else:
@@ -483,11 +483,11 @@ class MapEditor:
             self.owner.worldOrientation = [startOri[0],startOri[1],startOri[2]+(self.lookVelocity[0]*0.001)]
             startOri = self.owner.localOrientation.to_euler()
             self.owner.localOrientation = [startOri[0]+(self.lookVelocity[1]*0.001),startOri[1],startOri[2]]
-            
+
         self.centerMouse()
-        
+
         self.currentSensitivity = self.defaultSensitivity
-        
+
     def getCameraRay(self):
         return [self.cameraRay.hitObject,self.cameraRay.hitPosition,self.cameraRay.hitNormal]
 
@@ -498,17 +498,17 @@ class MapEditor:
         #render.drawLine(pos,end,[1,1,1])
         if(rayHit[0]!=None):
             render.drawLine(hitPos,[hitPos[0]+hitNorm[0],hitPos[1]+hitNorm[1],hitPos[2]+hitNorm[2]],[1,0,0])
-            
+
     def menuExists(self):
         existance = False
         scenes = logic.getSceneList()
         if "UI-pause" in scenes:
             existance = True
-            
+
         return existance
-            
+
     def run(self):
-#                if(logic.gameState['lockCursor'] == True):
+#                if(logic.utils.gameState['lockCursor'] == True):
         if(self.mouseMovement.triggered and self.mouseMovement.positive):
             if(self.currentMode==self.MODE_3D):
                 self.updateMousePosition()
@@ -517,20 +517,20 @@ class MapEditor:
         self.drawHitCursor()
         #self.cursor['position'] = str(self.cursor.position)
 #            else:
-#                logic.gameState['lockCursor'] = True
+#                logic.utils.gameState['lockCursor'] = True
 
 #try:
 def createMapEditor():
     print("setting up new map editor")
     newMapEditor = MapEditor()
     newMapEditor.centerMouse()
-    logic.gameState['mapEditor'] = newMapEditor
-    print(logic.gameState['mapEditor'])
-    
-if('mapEditor' in logic.gameState):
-    if logic.gameState['mapEditor'] != None:
+    logic.utils.gameState['mapEditor'] = newMapEditor
+    print(logic.utils.gameState['mapEditor'])
+
+if('mapEditor' in logic.utils.gameState):
+    if logic.utils.gameState['mapEditor'] != None:
     #try:
-        logic.gameState['mapEditor'].run()
+        logic.utils.gameState['mapEditor'].run()
     #except Exception as e:
     #    utils.log(e)
         #createMapEditor()
@@ -538,8 +538,7 @@ if('mapEditor' in logic.gameState):
         createMapEditor()
 else:
     createMapEditor()
-    
-#except Exception as e:        
-#    if('mapEditor' in logic.gameState):
+
+#except Exception as e:
+#    if('mapEditor' in logic.utils.gameState):
 #        utils.log(e)
-    

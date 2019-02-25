@@ -33,16 +33,18 @@ if(dm>1):
     dm = 1
 def getAngularAcceleration():
     av = own.getAngularVelocity(True)
-    
+
     if "init" in own:
         lastAv = own['lastAngularVel']
         own['angularAcc'] = getArrayProduct([av[0]-lastAv[0],av[1]-lastAv[1],av[2]-lastAv[2]])
         own['lastAngularVel'] = own.getAngularVelocity(True)
 
 def initAllThings():
-    print(logic.gameState['track']['checkpoints'])
-    logic.gameState['track']['nextCheckpoint'] = 1
-    for checkpoint in logic.gameState['track']['checkpoints']:
+
+    logic.player = own
+    print(logic.utils.gameState['track']['checkpoints'])
+    logic.utils.gameState['track']['nextCheckpoint'] = 1
+    for checkpoint in logic.utils.gameState['track']['checkpoints']:
         if checkpoint['metadata']['checkpoint order'] !=1:
             checkpoint.visible = False
         else:
@@ -53,7 +55,7 @@ def initAllThings():
     print("logic ticks per second: "+str(logic.getLogicTicRate()))
     print("max physics ticks per frame: "+str(logic.getMaxPhysicsFrame()))
     #logic.setLogicTicRate(60)
-    
+
     print("physics ticks per second: "+str(logic.getPhysicsTicRate()))
     logic.ghosts = []
     av = own.getAngularVelocity(True)
@@ -65,13 +67,13 @@ def initAllThings():
     own['settleStartTime'] = time.time()
     own['settleDuration'] = 0
     own['settleFrameRates'] = []
-    launchPos = copy.deepcopy(logic.gameState['launchPads'][0].position)
+    launchPos = copy.deepcopy(logic.utils.gameState['launchPads'][0].position)
     own['launchPosition'] = [launchPos[0],launchPos[1],launchPos[2]+1]
     own.position = own['launchPosition']
-    print("SPAWNING!!!"+str(logic.gameState['launchPads'][0].position))
-    own['rxPosition'] = copy.deepcopy(logic.gameState['launchPads'][0].position)
+    print("SPAWNING!!!"+str(logic.utils.gameState['launchPads'][0].position))
+    own['rxPosition'] = copy.deepcopy(logic.utils.gameState['launchPads'][0].position)
     own['rxPosition'][2]+=100
-    own.orientation = logic.gameState['launchPads'][0].orientation
+    own.orientation = logic.utils.gameState['launchPads'][0].orientation
     own['oporational'] = True
     own['vtxOporational'] = True
     own['damage'] = 0
@@ -81,16 +83,16 @@ def initAllThings():
     logic.countingDown = True
     logic.countdown = -1
     logic.finishedLastLap = False
-    logic.gameState['notification']['Text'] = ""
+    logic.utils.gameState['notification']['Text'] = ""
     #own['rxPosition'] = [-2279.73,-30.8,90]
-    
+
     print("init")
 def getArrayProduct(array):
     a = array[0]
     b = array[1]
     c = array[2]
     return math.sqrt((a**2)+(b**2)+(c**2))
-  
+
 def getAcc():
     lv = own.getLinearVelocity(True)
     try:
@@ -104,7 +106,7 @@ def getAcc():
             own['lastAirSpeedDiff'] = lv[2]
         except Exception as e:
             print(e)
-  
+
 def getStickPercentage(min,max,value):
     resolution = abs(min)+abs(max)
     percent = abs(((value-min)/resolution))
@@ -118,8 +120,8 @@ def setup(camera,angle):
         camera.applyRotation([angle,0,0],True)
         own['setup'] = True
         own['canReset'] = False
-        
-    
+
+
 def getSwitchValue(switchPercent,switchSetpoint):
     #if(switchInverted):
     #    switch = switchPercent>switchSetpoint
@@ -131,16 +133,16 @@ def resetGame():
     #act = own.actuators["restart"]
     #act.useRestart = True
     #cont.activate(act)
-    #own.position = logic.gameState['spawnPoints'][0]#own['startPosition']
-    #print("SPAWNING!!!"+str(logic.gameState['spawnPoints'][0]))
+    #own.position = logic.utils.gameState['spawnPoints'][0]#own['startPosition']
+    #print("SPAWNING!!!"+str(logic.utils.gameState['spawnPoints'][0]))
     #own.orientation = own['startOrientation']
     own.setLinearVelocity([0,0,0],True)
     own.setAngularVelocity([0,0,0],True)
-    
+
     own['lastAv'] = [0,0,0]
     if 'lastVel' in own:
         own['lastVel'] = [0,0,0]
-    lapTimer = logic.gameState['startFinishPlane']
+    lapTimer = logic.utils.gameState['startFinishPlane']
     lapTimer['lap'] = -1
     lapTimer['race time'] = 0.0
     for ghost in logic.ghosts:
@@ -148,8 +150,8 @@ def resetGame():
     logic.ghosts = []
     own['canReset'] = False
     initAllThings()
-    
-    
+
+
 def getRXVector(scale,rxPos):
     vectTo = own.getVectTo(rxPos)
     v = vectTo[1]
@@ -158,7 +160,7 @@ def getRXVector(scale,rxPos):
     return vect
 
 def applyVideoStatic():
-    
+
     hitList = []
 
     lastHitPos = own.position
@@ -174,31 +176,31 @@ def applyVideoStatic():
                 break
             vScale = 2
             rxVect = getRXVector(vScale,own['rxPosition'])
-            
+
             #print(lastHitPos)
             hitPos = [hitPos[0]+rxVect[0],hitPos[1]+rxVect[1],hitPos[2]+rxVect[2]]
             hitList.append(hitPos)
         lastHitPos = hitPos
 
-    #render.drawLine(own.position,list(hitList[0]),[1,1,1])    
+    #render.drawLine(own.position,list(hitList[0]),[1,1,1])
     #for i in range(0,len(hitList)-1):
     #    pos1 = list(hitList[i])
     #    pos2 = list(hitList[i+1])
     #    #render.drawLine(pos1,pos2,[1,1,1])
-    #    #render.drawLine(pos1,[pos1[0],pos1[1],pos1[2]+10],[1,0,0])    
+    #    #render.drawLine(pos1,[pos1[0],pos1[1],pos1[2]+10],[1,0,0])
     #print(interference)
     interference *= .1
     groundBreakup = (12-own.position[2])*0.3
     if(groundBreakup<1):
-      groundBreakup = 1    
+      groundBreakup = 1
     if(interference<1):
-      interference = 1  
+      interference = 1
 
     camera['rfNoise'] = own.getDistanceTo(own['rxPosition'])*.01*groundBreakup*interference+camera['eNoise']
 
 def killVideo():
     camera['rfNoise'] = 100
-  
+
 def stickInputToDPS(rcData, superRate=70, rcRate=90, rcExpo=0.0, superExpoActive=True):
     #0.27
     inputValue = rcCommand(rcData, rcRate, rcExpo)
@@ -234,7 +236,7 @@ def main():
     if(g['dedicatedThrottleStick'] == False):
         axis[g['throttleChannel']] -= (g['maxThrottle']-g['minThrottle'])/2
     if(axis != []): #if a radio is connected
-    
+
         #stick offsets
         own['channel0'] = axis[0]
         own['channel1'] = axis[1]
@@ -249,8 +251,8 @@ def main():
         sensativity = .0008
         for value in axis:
             values.append((value-center)*sensativity)
-            
-            
+
+
         throttleInverted = -(int(g['throttleInverted'])-0.5)*2
         yawInverted = -(int(g['yawInverted'])-0.5)*2
         pitchInverted = -(int(g['pitchInverted'])-0.5)*2
@@ -271,9 +273,9 @@ def main():
         rollPercent = getStickPercentage(g['minRoll'],g['maxRoll'],roll)
         armPercent = getStickPercentage(g['minArm'],g['maxArm'],armSwitch)
         resetPercent = getStickPercentage(g['minReset'],g['maxReset'],resetSwitch)
-        armed = getSwitchValue(armPercent,g['armSetpoint']) 
+        armed = getSwitchValue(armPercent,g['armSetpoint'])
         reset = getSwitchValue(resetPercent,g['resetSetpoint'])
-        
+
     else: #if no radio is connected
         throttlePercent = 0
         yawPercent = 0
@@ -281,7 +283,7 @@ def main():
         rollPercent = 0
         armed = False
         reset = False
-    rotationActuator = cont.actuators["movement"] 
+    rotationActuator = cont.actuators["movement"]
 
     #apply rotational force
     PE = g['pitchExpo']
@@ -361,15 +363,15 @@ def main():
                   propwash = 0.08
             except:
                 propwash = 0
-                
-            
-            
+
+
+
 
             #print(thrust)
             lvl = own.localLinearVelocity
 
             av = own.getAngularVelocity(True)
-            
+
             #if(propRay.positive==False):
             if(not own['propContact']):
                 rx = (random.randrange(0,200)-100)/300
@@ -378,7 +380,7 @@ def main():
                 pwrx = (rx*propwash/(1+propwash*1.00005))*88
                 pwry = (ry*propwash/(1+propwash*1.00005))*88
                 pwrz = (rz*propwash/(1+propwash*1.00005))*88
-                
+
                 angularAcc = own['angularAcc']
 
                 #AIR DAMPENING
@@ -390,7 +392,7 @@ def main():
 
                 st = 0.78*dm #how quick can the motor/pid orient the quad
                 lav = own.getAngularVelocity(True)
-                
+
                 own.setAngularVelocity([((pitchForce+pwrx)*st)+(lav[0]*(1-st)),((roleForce+pwry)*st)+(lav[1]*(1-st)),yawForce+pwrz], True)
                 if own.position[2] <0:
                     p = own.position
@@ -406,24 +408,23 @@ def main():
                 staticThrust = (throttlePercent**propThrottleCurve)*maxThrust*.55#*100)-(currentSpeed/maxSpeed)
                 #y = (((1**1.25)*4800)*.75)-x
                 thrust = staticThrust-(propLoad)-(propwash*100)
-                print(propLoad)
                 propPitch = 4.6
                 propSize = 5
                 newtonToKg = 0.101971621
                 motorNumber = 4
                 currentRPM = throttlePercent*g['rpm']
                 #thrust = 100*((4.392399*(10**-8))*currentRPM*((propSize**3.5)/math.sqrt(propPitch))*((4.23333*(10**-4))*currentRPM*propPitch-(currentSpeed/10)))*newtonToKg*motorNumber
-                
+
                 if(thrust<0):
                     thrust = 0
                 if 'lastThrust' in own:
                     thrust = (thrust*st)+(own['lastThrust']*(1-st))
                 own['lastThrust'] = thrust
-                
+
                 if(float(logic.raceTimer)!=0.0):
-                    
+
                     own.applyForce([0,0,thrust],True)
-                    
+
 
     else:
         thrust = 0
@@ -440,6 +441,7 @@ def main():
 own.applyForce([0,0,-98*own.mass],False)
 def isSettled():
     if not own['settled']:
+        logic.isSettled = False
         fps = logic.getAverageFrameRate()
         avgFPSList = own['settleFrameRates']
         avgFPSList.append(fps)
@@ -450,6 +452,7 @@ def isSettled():
             if deviation < 300:
                 logic.setTimeScale(1)
                 own['settled'] = True
+                logic.isSettled = True
         else:
             logic.setTimeScale(0.01)
             own.setLinearVelocity([0,0,0],True)
@@ -457,6 +460,7 @@ def isSettled():
         if len(avgFPSList)>1000:
             del avgFPSList[0]
             own['settled'] = True
+            logic.isSettled = True
             logic.setTimeScale(1)
             utils.log("WARNING!!!: FPS did not become stable after 2000 frames. Expect physics instability...")
             utils.log("standard deviation: "+str(deviation))
@@ -464,7 +468,7 @@ def isSettled():
         if(logic.finishedLastLap):
             logic.setTimeScale(0.001)
             #own.setLinearVelocity([0,0,0],True)
-        
+
 if(own.sensors['clock'].positive):
     main()
-isSettled() 
+isSettled()

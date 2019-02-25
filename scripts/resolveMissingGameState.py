@@ -2,7 +2,7 @@ import bge
 from scripts.gameUtils import utils
 logic = bge.logic
 try:
-    logic.gameState
+    logic.utils
 except:
     print("WARNING GAME STATE WAS INVALID!")
     logic.utils = utils()

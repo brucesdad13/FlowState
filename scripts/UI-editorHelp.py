@@ -19,11 +19,11 @@ def restartAction():
     for scene in scenes:
         if(scene!=currentScene):
             scene.end()
-    currentMap = logic.gameState["selectedMap"]
+    currentMap = logic.utils.gameState["selectedMap"]
     logic.utils.resetGameState()
-    logic.gameState["selectedMap"] = currentMap
+    logic.utils.gameState["selectedMap"] = currentMap
     currentScene.replace("Map Editor")
-    
+
 def mainMenuAction():
     scenes = logic.getSceneList()
     currentScene = logic.getCurrentScene()
@@ -32,11 +32,11 @@ def mainMenuAction():
             scene.end()
     logic.utils.resetGameState()
     currentScene.replace("Menu Background")
-    
+
 def helpAction():
     currentScene = logic.getCurrentScene()
     currentScene.replace("UI-editor-help")
-    
+
 def backAction():
     currentScene = logic.getCurrentScene()
     sceneHistory = logic.globalDict['sceneHistory']
@@ -51,12 +51,12 @@ def resumeAction():
     render.showMouse(0)
     currentScene = logic.getCurrentScene()
     currentScene.end()
-    logic.gameState['lockCursor'] = True
+    logic.utils.gameState['lockCursor'] = True
 
 if(owner['init']!=True):
     render.showMouse(1)
     logic.globalDict['sceneHistory'].append(logic.getCurrentScene().name)
-    logic.gameState['lockCursor'] = False
+    logic.utils.gameState['lockCursor'] = False
     owner['init'] = True
     window = UI.Window()
 
@@ -86,15 +86,15 @@ if(owner['init']!=True):
     mainMenuBlock = UI.BoxElement(window,[50,40],6,7, blockColor, 1)
     #mainMenuButton = UI.UIButton(mainMenuText,mainMenuBlock,mainMenuAction)
 
-    
+
     backBlockElement = UI.BoxElement(window,[90,10],1,.5, blockColor, 1)
     backText = UI.TextElement(window,backBlockElement.position, textColor, 0, "BACK")
     backButton = UI.UIButton(backText,backBlockElement,backAction)
-    
+
 
 else:
     try:
-        editor = logic.gameState['mapEditor']
+        editor = logic.utils.gameState['mapEditor']
         if(editor != None):
             if(editor.currentMode == editor.MODE_MENU):
                 UI.run(cont)
