@@ -11,7 +11,6 @@ logic = bge.logic
 scene = logic.getCurrentScene()
 playerName = "Sky2"+str(get_mac())
 utils = logic.utils
-
 def quitGame():
     print("exiting game")
     try:
@@ -92,7 +91,7 @@ def setup():
     global playerName
     #playerName += str(random.randint(10000,99999))
     print("setup")
-    utils.setNetworkClient(FSNClient.FSNClient("192.168.0.19",5069))
+    utils.setNetworkClient(FSNClient.FSNClient(utils.getServerIP(),5069))
     utils.getNetworkClient().connect()
     playerJoinEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_JOINED,playerName)
     utils.getNetworkClient().sendEvent(playerJoinEvent)

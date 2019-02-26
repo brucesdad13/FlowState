@@ -82,6 +82,13 @@ class utils:
     def selectMap(self,selectedMap):
         self.gameState["selectedMap"] = selectedMap
 
+    def setServerIP(self,serverIP):
+        self.gameState['serverIP'] = serverIP
+
+    def getServerIP(self):
+        print("server ip is "+repr(str(self.gameState['serverIP'])))
+        return self.gameState['serverIP']
+
     def getSelectedMap(self):
         return self.gameState["selectedMap"]
 
@@ -124,7 +131,7 @@ class utils:
         defaultData['profiles'].append(defaultProfile)
 
         #logic.maps = {"
-        logic.defaultGameState = {"selectedMap":"2018 Regional Final.fmp", "notification":{"Text":""}, "mode":self.MODE_MENU, "track":{"countdownTime":5,"checkpoints":[],"nextCheckpoint":1,"lastCheckpoint":1}, "playerData":{"lap":0,"checkpoint":0},"mapEditor":None,"networkClient":None}
+        logic.defaultGameState = {"selectedMap":"2018 Regional Final.fmp", "notification":{"Text":""}, "mode":self.MODE_MENU, "track":{"countdownTime":5,"checkpoints":[],"nextCheckpoint":1,"lastCheckpoint":1}, "playerData":{"lap":0,"checkpoint":0},"mapEditor":None,"serverIP":"localhost","networkClient":None}
         logic.loadGlobalDict()
         #self.log(logic.globalDict)
         if('version' in logic.globalDict):

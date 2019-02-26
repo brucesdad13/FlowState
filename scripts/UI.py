@@ -220,7 +220,7 @@ class UI:
 
     class TextInputElement(UIElement):
         primative = True
-        def __init__(self,window,position,color=[255,255,255],depth=0,text="",scale=1,parent=[],children=[]):
+        def __init__(self,window,position,color=[255,255,255],depth=0,text="",scale=1,parent=[],children=[],elementObject="UIInput"):
             self.window = window
             self.owner = None
             self.type = INPUT
@@ -236,6 +236,7 @@ class UI:
             self.children = children
             self.text = text
             self.disabled = False
+            self.elementObject = elementObject
             self.spawnElement()
 
         def getCenteredTextOffset(self,text):
@@ -257,7 +258,7 @@ class UI:
             self.getCenteredTextPosition(self.position)
 
         def spawnElement(self):
-            self.owner = scene.addObject("UIInput")
+            self.owner = scene.addObject(self.elementObject)
             self.updateElementPosition()
             self.setScale()
             self.setColor(self.color)
