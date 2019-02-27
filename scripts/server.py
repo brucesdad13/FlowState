@@ -9,12 +9,12 @@ import FSNObjects
 import traceback
 import time
 if (sys.version_info > (3, 0)):
-     # Python 3 code in this block
-     from _thread import *
- else:
-     # Python 2 code in this block
-     from threading import *
-     print("python 2 detected. Python 3 is recommended")
+    # Python 3 code in this block
+    from _thread import *
+else:
+    # Python 2 code in this block
+    from threading import *
+    print("python 2 detected. Python 3 is recommended")
 """The first argument AF_INET is the address domain of the
 socket. This is used when we have an Internet Domain with
 any two hosts The second argument is the type of socket.
