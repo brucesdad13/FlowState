@@ -8,7 +8,8 @@ import ast
 import FSNObjects
 import traceback
 import time
-if (sys.version_info > (3, 0)):
+print(sys.version_info)
+if (sys.version_info[0] > 3):
     # Python 3 code in this block
     from _thread import *
 else:
