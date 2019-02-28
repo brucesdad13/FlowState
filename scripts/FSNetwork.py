@@ -30,7 +30,12 @@ def addNewPlayer(playerID):
     print("addNewPlayer("+str(playerID)+")")
     newObj = scene.addObject("playerQuad",logic.player,0)
     logic.peers[playerID] = newObj #lets add this new player model to a dict so we can reference it later
-    
+
+def removePlayer(playerID):
+    print("removePlayer("+str(playerID)+")")
+    logic.peers['playerID'].endObject()
+    del logic.peers[playerID]
+        
 def clientMessageHandler(message):
     messageType = message[FSNObjects.MESSAGE_TYPE_KEY]
     #   ("message handler called! "+str(messageType))
@@ -64,6 +69,8 @@ def clientMessageHandler(message):
         if(message.eventType == FSNObjects.PlayerEvent.PLAYER_JOINED):
             #print("- player join event")
             addNewPlayer(message.senderID)
+        if(message.eventType == FSNObjects.PlayerEvent.PLAYER_QUIT):
+            removePlayer(message.senderID)
             
     #server state        
     if messageType == FSNObjects.SERVER_STATE: 
@@ -91,7 +98,8 @@ def setup():
     global playerName
     #playerName += str(random.randint(10000,99999))
     print("setup")
-    utils.setNetworkClient(FSNClient.FSNClient(utils.getServerIP(),5069))
+    #
+    utils.setNetworkClient(FSNClient.FSNClient(utils.getServerIP(),50001))
     utils.getNetworkClient().connect()
     playerJoinEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_JOINED,playerName)
     utils.getNetworkClient().sendEvent(playerJoinEvent)

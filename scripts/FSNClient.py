@@ -11,6 +11,7 @@ import traceback
 class FSNClient:
     def __init__(self, address, port):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.settimeout(10)
         self.serverIP = address#socket.gethostname()
         self.serverConnected = False
         print(self.serverIP)
