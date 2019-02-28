@@ -7,10 +7,16 @@ import ast
 import FSNObjects
 import traceback
 import time
-print(sys.version_info)
-if (sys.version_info[0] > 3):
+import platform
+from _thread import *
+
+pythonVersion = platform.sys.version.split()[0]
+print("python version: "+pythonVersion)
+majorVersion = int(pythonVersion.split('.')[0])
+if (majorVersion >= 3):
     # Python 3 code in this block
     from _thread import *
+    print("python 3 detected")
 else:
     # Python 2 code in this block
     from threading import *
