@@ -1,27 +1,29 @@
 import bge.logic as logic
 owner = logic.getCurrentController().owner
 #logic.globalDict['playerQuad'] = owner
+utils = logic.utils
 def main():
-    if('startFinishPlane' in logic.utils.gameState):
-        startFinishPlane = logic.utils.gameState['startFinishPlane']
-        lap = startFinishPlane['lap']
+    if(utils.getMode()!=utils.MODE_MULTIPLAYER):
+        if('startFinishPlane' in logic.utils.gameState):
+            startFinishPlane = logic.utils.gameState['startFinishPlane']
+            lap = startFinishPlane['lap']
 
-        if lap < 0:
-            logic.ghosts = []
-        else:
-            if len(logic.ghosts)-1<lap:
+            if lap < 0:
+                logic.ghosts = []
+            else:
+                if len(logic.ghosts)-1<lap:
+                    if(lap<6):
+                        ghostObject = addGhostQuad()
+                        logic.ghosts.append(createGhostData(owner,ghostObject))
+                        print("recording new ghost")
+                currentGhost = logic.ghosts[len(logic.ghosts)-1]
                 if(lap<6):
-                    ghostObject = addGhostQuad()
-                    logic.ghosts.append(createGhostData(owner,ghostObject))
-                    print("recording new ghost")
-            currentGhost = logic.ghosts[len(logic.ghosts)-1]
-            if(lap<6):
-                recordGhostData(owner,currentGhost)
-            if len(logic.ghosts)>1:
-                for i in range(0,len(logic.ghosts)-1):
-                    lastGhost = logic.ghosts[i]
+                    recordGhostData(owner,currentGhost)
+                if len(logic.ghosts)>1:
+                    for i in range(0,len(logic.ghosts)-1):
+                        lastGhost = logic.ghosts[i]
 
-                    setGhostData(lastGhost)
+                        setGhostData(lastGhost)
 
 def createGhostData(obj,ghostObject):
     return {"obj":ghostObject,"currentFrame":0,"frames":[{"pos":list(obj.position),"ori":[list(obj.orientation[0]),list(obj.orientation[1]),list(obj.orientation[2])]}]}

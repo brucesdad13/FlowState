@@ -15,6 +15,12 @@ def soloGameAction():
     currentScene = logic.getCurrentScene()
     render.showMouse(0)
     currentScene.replace("UI-map-select")
+    
+def multiplayerGameAction():
+    scenes = logic.getSceneList()
+    currentScene = logic.getCurrentScene()
+    render.showMouse(0)
+    currentScene.replace("UI-server-ip")
 
 def deleteMe():
     logic.utils.gameState['selectedMap'] = "custom.fmp"
@@ -57,16 +63,20 @@ if(owner['init']!=True):
     mainMenuText = UI.TextElement(window,mainMenuBlock.position, textColor, 0, "MAIN MENU")
 
 
-    soloGameBlockElement = UI.BoxElement(window,[10,50],2,1, blockColor, 1)
+    soloGameBlockElement = UI.BoxElement(window,[30,70],2.5,1.25, blockColor, 1)
     soloGameText = UI.TextElement(window,soloGameBlockElement.position, textColor, 0, "SINGLE PLAYER")
     soloGameButton = UI.UIButton(soloGameText,soloGameBlockElement,soloGameAction)
+    
+    multiplayerGameBlockElement = UI.BoxElement(window,[30,30],2.5,1.25, blockColor, 1)
+    multiplayerGameText = UI.TextElement(window,multiplayerGameBlockElement.position, textColor, 0, "MULTIPLAYER")
+    multiplayerGameButton = UI.UIButton(multiplayerGameText,multiplayerGameBlockElement,multiplayerGameAction)
 
     #asdf = UI.BoxElement(window,[50,50],10,9.9, [1,0,0,.5], 1)
-    editorBlockElement = UI.BoxElement(window,[50,50],2,1, blockColor, 1)
+    editorBlockElement = UI.BoxElement(window,[70,70],2.5,1.25, blockColor, 1)
     editorText = UI.TextElement(window,editorBlockElement.position, textColor, 0, "MAP EDITOR")
     editorGameButton = UI.UIButton(editorText,editorBlockElement,editorAction)
 
-    settingsBlockElement = UI.BoxElement(window,[90,50],2,1, blockColor, 1)
+    settingsBlockElement = UI.BoxElement(window,[70,30],2.5,1.25, blockColor, 1)
     settingsText = UI.TextElement(window,settingsBlockElement.position, textColor, 0, "SETTINGS")
 
     settingsButton = UI.UIButton(settingsText,settingsBlockElement,settingsAction)

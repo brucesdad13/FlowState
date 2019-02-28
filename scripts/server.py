@@ -1,4 +1,3 @@
-# Python program to implement server side of chat room.
 import socket
 import select
 import sys
@@ -8,29 +7,13 @@ import FSNObjects
 import traceback
 import time
 import platform
-from _thread import *
+import threading
 
-pythonVersion = platform.sys.version.split()[0]
-print("python version: "+pythonVersion)
-majorVersion = int(pythonVersion.split('.')[0])
-if (majorVersion >= 3):
-    # Python 3 code in this block
-    from _thread import *
-    print("python 3 detected")
-else:
-    # Python 2 code in this block
-    from threading import *
-    print("python 2 detected. Python 3 is recommended")
-"""The first argument AF_INET is the address domain of the
-socket. This is used when we have an Internet Domain with
-any two hosts The second argument is the type of socket.
-SOCK_STREAM means that data or characters are read in
-a continuous flow."""
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 delim = b'\x1E'
 # takes the first argument from command prompt as IP address
-IP_address = socket.gethostname()
+IP_address = "0.0.0.0"#socket.gethostname()
 
 # takes second argument from command prompt as port number
 port = 50001
@@ -42,6 +25,7 @@ binds the server to an entered IP address and at the
 specified port number.
 The client must be aware of these parameters
 """
+print("binding to "+str(IP_address)+":"+str(port))
 server.bind((IP_address, port))
 server.settimeout(30)
 
@@ -71,7 +55,7 @@ def outboundMessageThread():
             except Exception as e:
                 print(traceback.format_exc())
                 socketsToDisconnect.append(socket)
-    
+
         for socket in socketsToDisconnect:
             try:
                 socket.close()
@@ -79,9 +63,8 @@ def outboundMessageThread():
                 connectionList.remove(socket)
             except:
                 pass
-        
+
 def clientThread(conn, addr):
-    print("client thread started")
     connectionOpen = True
     # sends a message to the client whose user object is conn
     #conn.send("Welcome to this chatroom!")
@@ -120,7 +103,7 @@ def clientThread(conn, addr):
                             #removeByID(senderID)
                             remove(conn)
                             connectionOpen = False
-                            
+
 
                     #a player is sending an update about their current state
                     if messageType == FSNObjects.PLAYER_STATE:
@@ -131,7 +114,7 @@ def clientThread(conn, addr):
                         clientStates[senderID] = newClientState
                         #print(clientStates)
                         #let the client know they can send more data
-                    
+
 
                     if(frame!=None):
                         sendAck(conn)
@@ -165,7 +148,7 @@ def broadcast(message, socket):
 def send(message, socket):
     #print("send()")
     #global outboundMessages
-    
+
     #outboundMessages.append({"data":message,"socket":socket})
     try:
         dataOut = str(message).encode("utf-8")+delim
@@ -211,7 +194,7 @@ def removeByID(senderID):
             print("disconnecting client: "+str(senderID))
             connectionToDelete = clientConnection
             break
-    
+
     connectionList.remove(connectionToDelete)
     del clientStates[senderID]
     print(clientConnections)
@@ -237,10 +220,14 @@ while True:
 
         # creates and individual thread for every user
         # that connects
-        start_new_thread(clientThread,(conn,addr))
+        #start_new_thread(clientThread,(conn,addr))
+        threading.Thread(target=clientThread,
+            args=(conn,addr)
+        ).start()
+        print("client thread started")
         #start_new_thread(outboundMessageThread,())
     except:
-        pass
+        print(traceback.format_exc())
 
 conn.close()
 server.close()

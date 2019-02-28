@@ -51,6 +51,7 @@ def loadMultiplayerServer(serverName):
     utils.setMode(utils.MODE_MULTIPLAYER)
     utils.selectMap("Rotorcross.fmp")
     currentScene.replace("Main Game")
+    utils.setServerIP(serverName)
 
 def mapSelectAction(key,mapName):
     scenes = logic.getSceneList()
@@ -133,9 +134,9 @@ if(owner['init']!=True):
     
     #back button
     nameLabelBlockElement = UI.BoxElement(window,[40,50],10,.5, blockColor, 1)
-    nameLabelText = UI.TextElement(window,nameLabelBlockElement.position, textColor, 0, "MAP NAME:")
+    nameLabelText = UI.TextElement(window,nameLabelBlockElement.position, textColor, 0, "SERVER NAME:")
     nameLabelButton = UI.UIButton(nameLabelText,nameLabelBlockElement,backAction)
-    textInput = UI.TextInputElement(window,[55,50], textColor, 0, "new map",elementObject="UIInput.001")
+    textInput = UI.TextInputElement(window,[60,50], textColor, 0, "server ip address",elementObject="UIInput.001")
 
     #back button
     backBlockElement = UI.BoxElement(window,[10,10],1,.5, blockColor, 1)
@@ -148,6 +149,7 @@ if(owner['init']!=True):
     owner['window'].add("headerBox",headerBox)
     owner['window'].add("headerText",headerText)
     owner['window'].add("mapName",nameLabelButton)
+    owner['window'].add("textInput",textInput)
     #owner['window'].add("textInput",textInput)
 
 else:
@@ -160,9 +162,16 @@ else:
         enter = bge.events.ENTERKEY in pressedKeys
         if(pressedKeys!=[]):
             if(enter):
-                loadMultiplayerServer(servername)
-            print(pressedKeys)
-        #^text box stuff. please move into UI TextInput^
+                #owner['Text'].replace('\n','')
+                #owner['Text'].replace('\t',''
+                owner['Text'] = owner['Text'].rstrip()
+                serverIP = owner['Text']
+                print(serverIP)
+                loadMultiplayerServer(serverIP)
+            else:
+                print(pressedKeys)
+                #^text box stuff. please move into UI TextInput^
+                owner['window'].elements['textInput'].owner['Text'] = owner['Text']
     except Exception as e:
         utils.log(traceback.format_exc())
         owner['init'] = -1
