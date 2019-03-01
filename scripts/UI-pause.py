@@ -1,5 +1,6 @@
 import bge
 import traceback
+import time
 logic = bge.logic
 render = bge.render
 
@@ -7,7 +8,7 @@ scene = logic.getCurrentScene()
 cont = logic.getCurrentController()
 owner = cont.owner
 UI = bge.UI
-
+utils = logic.utils
 textColor = [1,1,1,1]
 blockColor = [0,0,1,0.75]
 
@@ -24,14 +25,17 @@ def restartAction():
     currentScene.replace("Main Game")
 
 def mainMenuAction():
-    scenes = logic.getSceneList()
-    currentScene = logic.getCurrentScene()
-    for scene in scenes:
-        if(scene!=currentScene):
-            scene.end()
-    logic.utils.resetGameState()
-    logic.utils.setMode(logic.utils.MODE_MENU)
-    currentScene.replace("Menu Background")
+    if(logic.utils.getMode()==logic.utils.MODE_MULTIPLAYER):
+        utils.getNetworkClient().quit()
+    else:
+        scenes = logic.getSceneList()
+        currentScene = logic.getCurrentScene()
+        for scene in scenes:
+            if(scene!=currentScene):
+                scene.end()
+        logic.utils.resetGameState()
+        logic.utils.setMode(logic.utils.MODE_MENU)
+        currentScene.replace("Menu Background")
 
 def settingsAction():
     currentScene = logic.getCurrentScene()

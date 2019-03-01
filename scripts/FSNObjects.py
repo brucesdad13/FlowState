@@ -119,6 +119,7 @@ class PlayerEvent:
     #player event types
     PLAYER_JOINED = 0
     PLAYER_QUIT = 1
+    PLAYER_MESSAGE = 2
 
     def __init__(self, eventType, senderID, extra=None):
         self.messageType = PLAYER_EVENT

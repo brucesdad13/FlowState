@@ -9,12 +9,11 @@ from uuid import getnode as get_mac
 import random
 logic = bge.logic
 scene = logic.getCurrentScene()
-playerName = "Sky2"+str(get_mac())
 utils = logic.utils
 def quitGame():
     print("exiting game")
     try:
-        utils.getNetworkClient().quit(playerName)
+        utils.getNetworkClient().quit()
     except:
         pass
     scenes = logic.getSceneList()
@@ -32,9 +31,16 @@ def addNewPlayer(playerID):
     logic.peers[playerID] = newObj #lets add this new player model to a dict so we can reference it later
 
 def removePlayer(playerID):
-    print("removePlayer("+str(playerID)+")")
-    logic.peers['playerID'].endObject()
-    del logic.peers[playerID]
+    try:
+        print("removePlayer("+str(playerID)+")")
+        logic.peers[playerID].endObject()
+        del logic.peers[playerID]
+    except:
+        print("failed to remove player: "+str(playerID))
+    
+def sendMessage(subject,body,to,messageFrom):
+    print("sending game message from server")
+    logic.sendMessage(subject)
         
 def clientMessageHandler(message):
     messageType = message[FSNObjects.MESSAGE_TYPE_KEY]
@@ -63,26 +69,30 @@ def clientMessageHandler(message):
             
     #player event       
     if messageType == FSNObjects.PLAYER_EVENT: 
-        #print("handling player event")
-        #print("message = "+str(message))
+        print("handling player event")
+        print("message = "+str(message))
         message = FSNObjects.PlayerEvent.getMessage(message)
         if(message.eventType == FSNObjects.PlayerEvent.PLAYER_JOINED):
             #print("- player join event")
             addNewPlayer(message.senderID)
         if(message.eventType == FSNObjects.PlayerEvent.PLAYER_QUIT):
             removePlayer(message.senderID)
+        if(message.eventType == FSNObjects.PlayerEvent.PLAYER_MESSAGE):
+            messageBody = None
+            MessageTo = None
+            MessageFrom = None
+            sendMessage(message.extra,messageBody,MessageTo,MessageFrom)
             
     #server state        
-    if messageType == FSNObjects.SERVER_STATE: 
-        #print("handling server state")
-        #print("message = "+str(message))
+    if messageType == FSNObjects.SERVER_STATE:
+        print("handling server state")
+        print("message = "+str(message))
         message = FSNObjects.ServerState.getMessage(message)
         peerStates = message.playerStates
         for key in peerStates:
-            if(key==playerName):
+            if(key==utils.getNetworkClient().clientID):
                 pass
             else:
-                #print(str(key)+" != "+str(playerName))
                 peerState = peerStates[key]
                 #print(peerStates)
                 message = FSNObjects.PlayerState.getMessage(peerState)
@@ -95,13 +105,11 @@ def clientMessageHandler(message):
                 peerObject.orientation = message.orientation
 
 def setup():
-    global playerName
-    #playerName += str(random.randint(10000,99999))
-    print("setup")
+    print("JOINING SERVER!!!")
     #
     utils.setNetworkClient(FSNClient.FSNClient(utils.getServerIP(),50001))
     utils.getNetworkClient().connect()
-    playerJoinEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_JOINED,playerName)
+    playerJoinEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_JOINED,utils.getNetworkClient().clientID)
     utils.getNetworkClient().sendEvent(playerJoinEvent)
     utils.getNetworkClient().setMessageHandler(clientMessageHandler)
     logic.peers = {}
@@ -111,7 +119,7 @@ def run():
     o = logic.player.orientation.to_euler()
     orientation = [o[0],o[1],o[2]]
     color = [0,0,1]
-    myState = FSNObjects.PlayerState(playerName,None,position,orientation,color)
+    myState = FSNObjects.PlayerState(utils.getNetworkClient().clientID,None,position,orientation,color)
         
     utils.getNetworkClient().updateState(myState)
     utils.getNetworkClient().run()

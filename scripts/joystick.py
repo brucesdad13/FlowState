@@ -5,6 +5,8 @@ import copy
 import bge.render as render
 import time
 import statistics
+import FSNClient
+import FSNObjects
 utils = logic.utils
 cont = logic.getCurrentController()
 own = cont.owner
@@ -51,9 +53,9 @@ def initAllThings():
             checkpoint.visible = True
     #logic.setPhysicsTicRate(120)
     #logic.setLogicTicRate(120)
-    print("max logic ticks per frame: "+str(logic.getMaxLogicFrame()))
-    print("logic ticks per second: "+str(logic.getLogicTicRate()))
-    print("max physics ticks per frame: "+str(logic.getMaxPhysicsFrame()))
+    #print("max logic ticks per frame: "+str(logic.getMaxLogicFrame()))
+    #print("logic ticks per second: "+str(logic.getLogicTicRate()))
+    #print("max physics ticks per frame: "+str(logic.getMaxPhysicsFrame()))
     #logic.setLogicTicRate(60)
 
     print("physics ticks per second: "+str(logic.getPhysicsTicRate()))
@@ -70,7 +72,7 @@ def initAllThings():
     launchPos = copy.deepcopy(logic.utils.gameState['launchPads'][0].position)
     own['launchPosition'] = [launchPos[0],launchPos[1],launchPos[2]+1]
     own.position = own['launchPosition']
-    print("SPAWNING!!!"+str(logic.utils.gameState['launchPads'][0].position))
+    #print("SPAWNING!!!"+str(logic.utils.gameState['launchPads'][0].position))
     own['rxPosition'] = copy.deepcopy(logic.utils.gameState['launchPads'][0].position)
     own['rxPosition'][2]+=100
     own.orientation = logic.utils.gameState['launchPads'][0].orientation
@@ -78,7 +80,6 @@ def initAllThings():
     own['vtxOporational'] = True
     own['damage'] = 0
     own.mass = g['weight']/1000
-    print("SETTING MASS"+str(own.mass))
     print(own.mass)
     logic.countingDown = True
     logic.countdown = -1
@@ -433,8 +434,16 @@ def main():
 
     if(reset == False)&(own['canReset']==False):
         own['canReset'] = True
+        print("canReset = True")
     if((reset)&own['canReset']):
-        resetGame()
+        if(utils.getMode()!=utils.MODE_MULTIPLAYER):
+            resetGame()
+        else:
+            resetEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_MESSAGE,utils.getNetworkClient().clientID,"reset")
+            utils.getNetworkClient().sendEvent(resetEvent)
+            print("sending reset message")
+            own['canReset'] = False
+        
     own['lastAv'] = own.getAngularVelocity(True)
     #if(logic.getAverageFrameRate()>60):
     #    logic.setTimeScale(1)
@@ -472,3 +481,5 @@ def isSettled():
 if(own.sensors['clock'].positive):
     main()
 isSettled()
+if(own.sensors['Message'].positive):
+    resetGame()

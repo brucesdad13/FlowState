@@ -7,6 +7,7 @@ import time
 import ast
 import FSNObjects
 import traceback
+from uuid import getnode as get_mac
 
 class FSNClient:
     def __init__(self, address, port):
@@ -23,6 +24,8 @@ class FSNClient:
         self.state = FSNObjects.PlayerState(None, None, None, None, None)
         self.messageHandler = None
         self.serverReady = True
+        self.readyToQuit = False
+        self.clientID = str(time.time())+str(get_mac())
         
     def connect(self):
         if(not self.serverConnected):
@@ -63,7 +66,7 @@ class FSNClient:
                 except Exception as e:
                     print(traceback.format_exc())
                     print("server unresponsive")
-                    self.hardQuit()
+                    self.quit()
                     break
                 
         return frame
@@ -82,15 +85,10 @@ class FSNClient:
     def setMessageHandler(self,method):
         self.messageHandler = method
         
-    def quit(self,senderID):
-        print("soft quit")
-        quitEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_QUIT,senderID)
-        self.sendEvent(quitEvent)
-        self.server.close()
-        self.serverConnected = False
-        
-    def hardQuit(self):
-        print("hard quit")
+    def quit(self):
+        print("quit")
+        #quitEvent = FSNObjects.PlayerEvent(FSNObjects.PlayerEvent.PLAYER_QUIT,self.clientID)
+        #self.sendEvent(quitEvent)
         self.server.close()
         self.serverConnected = False
         
@@ -98,11 +96,15 @@ class FSNClient:
         return self.serverConnected
 
     def run(self):
-        if(self.serverReady):
-            messageOut = str(self.state).encode("utf-8")
-            self.sendFrame(messageOut)
-            self.serverReady = False
-        frame = self.recvFrame()
+        if(self.isConnected()): #the socket is still connected
+            if(self.serverReady): #we have recieved an ack since our last message
+                messageOut = str(self.state).encode("utf-8")
+                self.sendFrame(messageOut)
+                self.serverReady = False #this gets set true once we get another ack
+            frame = self.recvFrame() #let's recv and handle anything the server has sent
+            
+                
+        
 
     
     
