@@ -31,6 +31,7 @@ def applySettings():
                 scene.restart()
 
     logic.saveGlobalDict()
+    backAction()
 
 def spawnBoolRow(label,height,key,action):
 

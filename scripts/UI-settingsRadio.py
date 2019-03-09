@@ -53,6 +53,7 @@ def applySettings():
                 scene.restart()
 
     logic.saveGlobalDict()
+    backAction()
 
 def backAction():
     currentScene = logic.getCurrentScene()

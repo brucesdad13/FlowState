@@ -68,6 +68,7 @@ class MapEditor:
 
 
         self.currentMode = self.MODE_3D
+        self.unitsMetric = True
         render.showMouse(0)
         print("HIDE MOUSE")
 
@@ -94,7 +95,11 @@ class MapEditor:
 
         if(self.snapPosition):
             cPos = self.cursor.position
-            self.cursor.position = [roundTo(cPos[0],self.posSnap),roundTo(cPos[1],self.posSnap),roundTo(cPos[2],self.posSnap)]
+            x = round(cPos[0] / self.posSnap) * self.posSnap
+            y = round(cPos[1] / self.posSnap) * self.posSnap
+            z = round(cPos[2] / self.posSnap) * self.posSnap
+            #self.cursor.position = [roundTo(cPos[0],self.posSnap),roundTo(cPos[1],self.posSnap),roundTo(cPos[2],self.posSnap)]
+            self.cursor.position = [x,y,z]
         self.cursor.applyMovement([0,0,height],False)
         self.cursor.orientation = [0,0,0]
         if(self.snapOrientation):
@@ -301,6 +306,14 @@ class MapEditor:
     def enterMenuMode(self):
         self.setMode(self.MODE_MENU)
 
+    def toggleUnits(self):
+        worldScale = 10
+        self.unitsMetric = not self.unitsMetric
+        if(self.unitsMetric):
+            self.posSnap = 1*worldScale
+        else:
+            self.posSnap = 0.304803706*worldScale
+
     def handleInputs(self):
         (pressedKeys,activeKeys,inactiveKeys,releasedKeys) = self.getKeyStates(self.keyboard)
 
@@ -321,6 +334,7 @@ class MapEditor:
         right = bge.events.DKEY in activeKeys
         left = bge.events.AKEY in activeKeys
 
+        #editor controls
         snapToggle = bge.events.GKEY in pressedKeys
         toggleScale = bge.events.TKEY in pressedKeys
         resetScaleRot = bge.events.RKEY in pressedKeys

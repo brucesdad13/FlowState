@@ -52,11 +52,15 @@ if(owner['init']==1):
                 cursorPos = list(logic.utils.gameState['mapEditor'].cursor.position)
                 cursorOri = list(logic.utils.gameState['mapEditor'].cursor.orientation.to_euler())
                 cursorOri = [math.degrees(cursorOri[0]),math.degrees(cursorOri[1]),math.degrees(cursorOri[2])]
-
-                positionValue = "P: "+str(round(cursorPos[0],digits))+","+str(round(cursorPos[1],digits))+","+str(round(cursorPos[2],digits))
+                if(logic.utils.getMapEditor().unitsMetric):
+                    unit = 0.1 #metric (the game is scale 10x because of bullet physics)
+                    positionValue = "meters: "+str(round(cursorPos[0]*unit,digits))+","+str(round(cursorPos[1]*unit,digits))+","+str(round(cursorPos[2]*unit,digits))
+                else:
+                    unit = 3.2808*0.1
+                    positionValue = "feet: "+str(round(cursorPos[0]*unit,digits))+","+str(round(cursorPos[1]*unit,digits))+","+str(round(cursorPos[2]*unit,digits))
                 updateElementValue(window.elements['positionText'], positionValue)
 
-                orientationValue = "O: "+str(round(cursorOri[0],digits))+","+str(round(cursorOri[1],digits))+","+str(round(cursorOri[2],digits))
+                orientationValue = "degrees: "+str(round(cursorOri[0],digits))+","+str(round(cursorOri[1],digits))+","+str(round(cursorOri[2],digits))
                 updateElementValue(window.elements['orientationText'], orientationValue)
 
                 editing = logic.utils.gameState['mapEditor'].editing

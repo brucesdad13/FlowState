@@ -36,6 +36,10 @@ def saveAction():
     logic.sendMessage("saveMap")
     logic.utils.gameState['mapEditor'].setMode(logic.utils.gameState['mapEditor'].MODE_3D)
 
+def toggleUnitsAction():
+    print("toggleUnitsAction()")
+    logic.utils.getMapEditor().toggleUnits()
+    print(logic.utils.getMapEditor().unitsMetric)
 
 def mainMenuAction():
     scenes = logic.getSceneList()
@@ -132,6 +136,10 @@ if(owner['init']==0):
     #playText = UI.TextElement(window,playBlock.position, textColor, 0, "PLAY")
     #playButton = UI.UIButton(playText,playBlock,playAction)
 
+    unitsBlock = UI.BoxElement(window,[90,90],2,.5, blockColor, 1)
+    unitsText = UI.TextElement(window,unitsBlock.position, textColor, 0, "TOGGLE UNITS")
+    unitsButton = UI.UIButton(unitsText,unitsBlock,toggleUnitsAction)
+
     saveBlock = UI.BoxElement(window,[75,2.5],1,.5, blockColor, 1)
     saveText = UI.TextElement(window,saveBlock.position, textColor, 0, "SAVE")
     saveButton = UI.UIButton(saveText,saveBlock,saveAction)
@@ -150,9 +158,9 @@ if(owner['init']==0):
     owner['window'].add("mainMenuBlock",mainMenuBlock)
     owner['window'].add("mainMenuText",mainMenuText)
     owner['window'].add("mainMenuButton",mainMenuButton)
-    #owner['window'].add("playBlock",playBlock)
-    #owner['window'].add("playText",playText)
-    #owner['window'].add("playButton",playButton)
+    owner['window'].add("unitsBlock",unitsBlock)
+    owner['window'].add("unitsText",unitsText)
+    owner['window'].add("unitsButton",unitsButton)
     owner['window'].add("saveBlock",saveBlock)
     owner['window'].add("saveText",saveText)
     owner['window'].add("saveButton",saveButton)

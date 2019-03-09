@@ -6,6 +6,7 @@ scene = logic.getCurrentScene()
 cont = logic.getCurrentController()
 owner = cont.owner
 UI = bge.UI
+utils = logic.utils
 
 textColor = [1,1,1,1]
 blockColor = [0,0,1,0.75]
@@ -52,12 +53,12 @@ def applySettings():
     for scene in scenes:
         if(scene!=currentScene):
             if(scene.name == "Main Game"):
-                currentMap = logic.gameState["selectedMap"]
+                currentMap = utils.getSelectedMap()
                 logic.utils.resetGameState()
-                logic.gameState["selectedMap"] = currentMap
                 scene.restart()
     
     logic.saveGlobalDict()
+    backAction()
     
 def backAction():
     currentScene = logic.getCurrentScene()

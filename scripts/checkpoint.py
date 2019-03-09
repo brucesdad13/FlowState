@@ -28,8 +28,8 @@ def angle(v1, v2, acute):
 def setCheckpointVisibilities():
     for checkpoint in logic.utils.gameState['track']['checkpoints']:
         if(checkpoint['metadata']['checkpoint order'] == logic.utils.gameState['track']['nextCheckpoint']):
-            #checkpoint.visible = True
-            checkpoint.visible = False
+            #checkpoint.visible = False
+            checkpoint.visible = True
         else:
             checkpoint.visible = False
 def getNormalVect(vect):
@@ -65,7 +65,7 @@ if colSensor.positive and colSensor.triggered:
                 else:
                     logic.utils.gameState['track']['nextCheckpoint']+=1
                 setCheckpointVisibilities()
-                #soundActuator = cont.actuators['Sound']
-                #soundActuator.volume = 1
-                #soundActuator.startSound()
+                soundActuator = cont.actuators['Sound']
+                soundActuator.volume = 1
+                soundActuator.startSound()
                 print("CHECKPOINT!")

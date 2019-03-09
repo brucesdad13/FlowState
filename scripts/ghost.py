@@ -46,6 +46,7 @@ def setGhostData(ghost):
         ghost["obj"].position = [0,0,-100000]
 def addGhostQuad():
     actuator = owner.actuators["addGhost"]
+    actuator.object = "ghostQuad"
     actuator.instantAddObject()
     print(actuator.objectLastCreated)
     obj = actuator.objectLastCreated
